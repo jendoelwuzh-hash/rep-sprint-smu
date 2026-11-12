@@ -2,7 +2,7 @@
 // Tugas Sentinel: Pantau ketersediaan model Gemini
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const CURRENT_MODEL = "models/gemini-3.8-flash";
+const CURRENT_MODEL = "models/gemini-flash-latest";
 const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`;
 
 async function checkModels() {

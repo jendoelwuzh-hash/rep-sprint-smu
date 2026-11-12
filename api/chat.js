@@ -1,62 +1,60 @@
 // Vercel Serverless Function -> /api/chat
-// Penyedia AI: Gemini API
-
-const MODEL = "models/gemini-3.8-flash";
-
+const MODEL = "gemini-2.5-flash";
 
 export default async function handler(req, res) {
-  // Tambahkan Header CORS agar aman
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  console.log("Request received:", req.method, req.url);
+  // Sentinel: Cek apakah key terbaca
+  const keyExists = !!process.env.GEMINI_API_KEY;
+  console.log("Sentinel Check: GEMINI_API_KEY exists?", keyExists);
+
+  if (!keyExists) {
+    console.error("CRITICAL: GEMINI_API_KEY is not defined in environment");
+    return res.status(500).json({ error: "Configuration Error: API Key missing in Vercel" });
+  }
 
   try {
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) {
-      console.error("CRITICAL: Missing GEMINI_API_KEY");
-      return res.status(500).json({ error: "Configuration error: Missing API Key" });
-    }
-
     const { system, messages } = req.body || {};
+
     if (!Array.isArray(messages)) {
       return res.status(400).json({ error: "Invalid request body" });
     }
 
-    // Transformasi pesan
     const contents = messages.map(m => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: String(m.content || " ") }]
     }));
+    if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
-    if (system) {
-      contents.unshift({ role: "user", parts: [{ text: String(system) }] });
-    }
-
-    const body = { contents, generationConfig: { maxOutputTokens: 4096 } };
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${geminiKey}`;
 
+    console.log("Sentinel: Calling Gemini API...");
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ contents, generationConfig: { maxOutputTokens: 4096 } }),
     });
 
-    const data = await r.json();
+    // Sentinel: Baca teks dulu
+    const responseText = await r.text();
+    console.log("Sentinel: Response status:", r.status);
+    console.log("Sentinel: Raw Response:", responseText);
 
     if (!r.ok) {
-      console.error("Gemini API Error:", data);
-      return res.status(502).json({ error: "AI Service Error", detail: data.error?.message || "Unknown error" });
+      throw new Error(`API Error ${r.status}: ${responseText}`);
     }
 
+    const data = JSON.parse(responseText);
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     return res.status(200).json({ text: text || "Maaf, AI tidak memberikan jawaban." });
 
   } catch (e) {
-    console.error("Internal Server Error:", e);
+    console.error("Internal Server Error:", e.message);
     return res.status(500).json({ error: "Internal server error", detail: e.message });
   }
 }

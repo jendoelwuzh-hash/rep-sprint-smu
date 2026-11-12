@@ -1,5 +1,7 @@
 
+import { InteractiveVisualizer } from './components/InteractiveMath';
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useChat } from '@ai-sdk/react';
 import "./sprint-smu.css";
 import { useAuth } from './context/AuthContext'; // Import useAuth
 import { supabase } from './lib/supabaseClient'; // TAMBAHKAN INI
@@ -440,9 +442,16 @@ function App() {
     const [histories, setHistories] = useState({});
     const [activeUnit, setActiveUnit] = useState(null);
     const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState("");
-    const [pending, setPending] = useState(false);
+
+    // Gunakan useChat dari Vercel AI SDK
+    const { messages, input, handleInputChange, handleSubmit, isLoading: pending, append } = useChat({
+        api: '/api/chat',
+        body: {
+            activeAgentId: activeAgent?.id,
+            activeUnitId: activeUnit?.id
+        }
+    });
+
     const [error, setError] = useState(null);
     const [scanImage, setScanImage] = useState(null); // {file, previewUrl}
     const [scanResult, setScanResult] = useState(null);
@@ -472,33 +481,19 @@ function App() {
     useEffect(() => {
         scrollRef.current && scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }, [messages, pending]);
-    useEffect(() => {
-        const key = sessionKey(activeUnit, activeAgent);
-        setHistories((h) => {
-            const next = { ...h, [key]: serializeMessages(messages) };
-            saveJSON("sprint-smu-histories-v1", next);
-            return next;
-        });
-        // eslint-disable-next-line
-    }, [messages]);
+
     const openChat = useCallback((unit, agent) => {
         setActiveUnit(unit);
         const a = agent || AGENTS[0];
         setActiveAgent(a);
-        setMessages(deserializeMessages(histories[sessionKey(unit, a)]));
         setError(null);
         setTab("tutor");
-    }, [histories]);
+    }, []);
+
     const send = useCallback(async (overrideText) => {
         const text = (overrideText !== undefined ? overrideText : input).trim();
-        if (!text)
-            return;
-        setInput("");
-        setError(null);
-        const userMsg = { role: "user", text };
-        const nextMessages = [...messages, userMsg];
-        setMessages(nextMessages);
-        setPending(true);
+        if (!text) return;
+
         const instructionText = [
             activeAgent.system,
             "INSTRUKSI WAJIB: Untuk setiap ilustrasi visual, diagram, atau grafik, SELALU gunakan format diagram Mermaid (di dalam blok ```mermaid ... ```). JANGAN PERNAH menggunakan ASCII atau teks biasa untuk menggambarkan bentuk, vektor, atau grafik.",
@@ -509,26 +504,11 @@ function App() {
                 ", topik: " + activeUnit.title + " (" + activeUnit.subtitle + ").") : "",
             BASE_RULES,
         ].filter(Boolean).join("\n\n");
-        const turns = [{ role: "user", content: instructionText }]
-            .concat(nextMessages.slice(-16).map((m) => ({ role: m.role, content: m.text || " " })));
-        if (!sampleFn) {
-            setError(errorCopy("not_granted"));
-            setPending(false);
-            return;
-        }
-        try {
-            const res = await sampleFn(turns, { cache: false, modelTier: "default" });
-            setMessages((cur) => [...cur, { role: "assistant", text: res.text }]);
-            if (activeUnit)
-                setProgress((p) => bumpUnit(p, activeUnit.id));
-        }
-        catch (e) {
-            setError((e && e.text) ? e.text : errorCopy(e && e.code));
-        }
-        finally {
-            setPending(false);
-        }
-    }, [input, messages, activeAgent, activeUnit, sampleFn]);
+
+        await append({ role: 'user', content: `${instructionText}\n\n${text}` });
+
+        if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
+    }, [input, activeAgent, activeUnit, append]);
     const handlePickPhoto = (e) => {
         const file = e.target.files && e.target.files[0];
         e.target.value = "";
@@ -725,6 +705,7 @@ function AgentsTab({ onPick, card, border }) {
             React.createElement("span", { style: { color: "#475569" } }, "\u203A")))))));
 }
 function TutorTab({ unit, agent, messages, pending, error, input, setInput, onSend, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
+    const showTransformation = unit && unit.id === 'mat-11-transformasi';
     return (React.createElement("div", { style: { display: "flex", flexDirection: "column", height: "100%" } },
         React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 } },
             React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4, fontSize: 16 } }, "\u2190"),
@@ -734,14 +715,20 @@ function TutorTab({ unit, agent, messages, pending, error, input, setInput, onSe
                     unit ? " · " + unit.title : ""),
                 React.createElement("div", { style: { fontSize: 11, color: "#94A3B8" } }, agent.tagline)),
             messages.length > 0 && (React.createElement("button", { onClick: onClearHistory, title: "Hapus riwayat topik ini", style: { background: "none", border: "none", color: "#64748B", cursor: "pointer", padding: 4 } }, "\uD83D\uDDD1\uFE0F")),
-            React.createElement("select", { value: agent.id, onChange: (e) => onChangeAgent(AGENTS.find((a) => a.id === e.target.value)), style: { background: card, color: "#E2E8F0", border: "1px solid " + border, borderRadius: 8, fontSize: 11.5, padding: "6px 8px" } }, AGENTS.map((a) => React.createElement("option", { key: a.id, value: a.id }, a.name)))),
+            React.createElement("select", { value: agent.id, onChange: (e) => onChangeAgent(AGENTS.find((a) => a.id === e.target.value)), style: { background: card, color: "#E2E8F0", border: "1px solid " + border, borderRadius: 8, fontSize: 11.5, padding: "6px 8px" } }, AGENTS.map((a) => React.createElement("option", { key: a.id, value: a.id }, a.name))),
+        ),
+
+        unit && React.createElement("div", { style: { marginBottom: 10 } },
+            React.createElement(InteractiveVisualizer, { unitId: unit.id })
+        ),
+
         React.createElement("div", { ref: scrollRef, style: { flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, paddingBottom: 10 } },
             messages.length === 0 && (React.createElement("div", { style: { background: card, border: "1px solid " + border, borderRadius: 12, padding: 14, fontSize: 12.5, color: "#94A3B8", display: "flex", gap: 8 } },
                 React.createElement("span", null, agent.emoji),
                 React.createElement("span", null, unit ? ("Tanya apa saja soal " + unit.title + ", atau ketik \"kasih soal\" biar " + agent.name + " mulai duluan.") : "Ceritakan topik atau soal yang mau kamu bahas dulu."))),
             messages.map((m, i) => (React.createElement("div", { key: i, style: { alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%", background: m.role === "user" ? "#1D4ED8" : card, border: m.role === "user" ? "none" : "1px solid " + border, borderRadius: 14, padding: "10px 13px", fontSize: 13.5, lineHeight: 1.5, position: "relative" } },
-                React.createElement(MathText, { text: m.text }),
-                m.role === "assistant" && React.createElement("button", { onClick: () => speakText(m.text), style: { position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 } }, "🔊")))),
+                React.createElement(MathText, { text: m.content }),
+                m.role === "assistant" && React.createElement("button", { onClick: () => speakText(m.content), style: { position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 } }, "🔊")))),
             pending && React.createElement("div", { style: { alignSelf: "flex-start", background: card, border: "1px solid " + border, borderRadius: 14, padding: "10px 13px" } },
                 React.createElement("span", { className: "spinner" })),
             error && React.createElement("div", { style: { color: "#FCA5A5", fontSize: 12 } }, error)),
