@@ -1,0 +1,11 @@
+// simpan sebagai cek-model.js
+const API_KEY = "AQ.Ab8RN6IoZS3nvWPgRE5be5PoKxzF4L9Fbij1iqvL6_z7R5IUWA";
+const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${AQ.Ab8RN6IoZS3nvWPgRE5be5PoKxzF4L9Fbij1iqvL6_z7R5IUWA}`;
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    console.log("Model yang tersedia:");
+    console.log(data.models.map(m => m.name));
+  })
+  .catch(err => console.error(err));

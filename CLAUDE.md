@@ -1,0 +1,1 @@
+folder ini berisi aplikasi yang mambantu siswa untuk lebih memahami pelajaran matematika, kimia dan fisika, claude harus berusaha keras untuk aplikasi ini berjalan dengan sempurna 
