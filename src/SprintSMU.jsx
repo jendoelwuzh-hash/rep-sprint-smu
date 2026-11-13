@@ -454,12 +454,14 @@ function App() {
 
     const { messages, input, handleSubmit, isLoading: pending, append } = chatHook;
 
-    // Wrapper eksplisit untuk handleInputChange
+    // Implementasi handleInputChange mandiri yang aman
     const handleInputChange = (e) => {
         if (chatHook.handleInputChange) {
             chatHook.handleInputChange(e);
+        } else if (chatHook.setInput) {
+            chatHook.setInput(e.target.value);
         } else {
-            console.error("handleInputChange tidak ditemukan!");
+            console.error("handleInputChange dan setInput tidak ditemukan!");
         }
     };
 
