@@ -602,7 +602,7 @@ function App() {
             tab === "home" && (React.createElement(HomeTab, { progress: progress, activeSubject: activeSubject, setActiveSubject: setActiveSubject, activeGrade: activeGrade, setActiveGrade: setActiveGrade, onOpenUnit: (unit) => openChat(unit, AGENTS[0]), card: card, border: border })),
             tab === "camera" && (React.createElement(CameraTab, { scanImage: scanImage, scanResult: scanResult, scanning: scanning, imagesOk: imagesOk, sampleReady: !!sampleFn, onPick: () => fileInputRef.current && fileInputRef.current.click(), onRemove: () => { setScanImage(null); setScanResult(null); }, onScan: runScan, onDiscuss: discussScan, onGoToTutor: () => setTab(activeUnit || messages.length ? "tutor" : "agents"), card: card, border: border })),
             tab === "agents" && (React.createElement(AgentsTab, { onPick: (agent) => openChat(activeUnit, agent), card: card, border: border })),
-            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: input, scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
+            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: input, handleInputChange: handleInputChange, handleSubmit: handleSubmit, scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
             tab === "progress" && React.createElement(ProgressTab, { progress: progress, card: card, border: border }))),
         React.createElement("input", { ref: fileInputRef, id: "camera-file-input", type: "file", accept: "image/*", onChange: handlePickPhoto, style: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 } }),
         helpSummary !== null && (React.createElement("div", { style: { position: "absolute", inset: 0, background: "rgba(5,9,20,0.85)", zIndex: 50, display: "flex", alignItems: wide ? "center" : "flex-end", justifyContent: "center" } },
@@ -716,7 +716,7 @@ function AgentsTab({ onPick, card, border }) {
                 React.createElement("div", { style: { fontSize: 11.5, color: "#94A3B8", marginTop: 1 } }, a.tagline)),
             React.createElement("span", { style: { color: "#475569" } }, "›")))))));
 }
-function TutorTab({ unit, agent, messages, pending, error, input, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
+function TutorTab({ unit, agent, messages, pending, error, input, handleInputChange, handleSubmit, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
     const showTransformation = unit && unit.id === 'mat-11-transformasi';
     return (React.createElement("div", { style: { display: "flex", flexDirection: "column", height: "100%" } },
         React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 } },
