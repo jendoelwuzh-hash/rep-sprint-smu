@@ -444,13 +444,24 @@ function App() {
     const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
 
     // Gunakan useChat dari Vercel AI SDK
-    const { messages, input, handleInputChange, handleSubmit, isLoading: pending, append } = useChat({
+    const chatHook = useChat({
         api: '/api/chat',
         body: {
             activeAgentId: activeAgent?.id,
             activeUnitId: activeUnit?.id
         }
     });
+
+    const { messages, input, handleSubmit, isLoading: pending, append } = chatHook;
+
+    // Wrapper eksplisit untuk handleInputChange
+    const handleInputChange = (e) => {
+        if (chatHook.handleInputChange) {
+            chatHook.handleInputChange(e);
+        } else {
+            console.error("handleInputChange tidak ditemukan!");
+        }
+    };
 
     const [error, setError] = useState(null);
     const [scanImage, setScanImage] = useState(null); // {file, previewUrl}
