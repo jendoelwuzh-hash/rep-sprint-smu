@@ -454,7 +454,7 @@ function App() {
     const { messages, input, handleSubmit, isLoading: pending, append } = chatHook;
 
     // Implementasi handleInputChange mandiri yang aman
-        const handleInputChange = useCallback((e) => {
+    const handleInputChange = useCallback((e) => {
         if (chatHook && typeof chatHook.handleInputChange === 'function') {
             chatHook.handleInputChange(e);
         } else if (chatHook && typeof chatHook.setInput === 'function') {
@@ -463,8 +463,6 @@ function App() {
             console.error("handleInputChange/setInput tidak tersedia di chatHook:", chatHook);
         }
     }, [chatHook]);
-        }
-    };
 
     const [error, setError] = useState(null);
     const [scanImage, setScanImage] = useState(null); // {file, previewUrl}
