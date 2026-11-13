@@ -14,8 +14,10 @@ const growthbook = new GrowthBook({
   enableDevMode: true,
 });
 
+// Hapus atau komentari blok di bawah ini
+/*
 Sentry.init({
-  dsn: "YOUR_SENTRY_DSN_HERE", // Sentinel: Sentry DSN perlu diisi setelah akun Sentry dibuat
+  dsn: "YOUR_SENTRY_DSN_HERE", 
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
@@ -24,6 +26,7 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });
+*/
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
