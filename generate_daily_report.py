@@ -8,8 +8,9 @@ import requests
 # load_dotenv()
 
 # Manually load variables from .env file
-def load_env_manually(filepath="/sessions/nice-beautiful-tesla/mnt/sprint-smu/.env"):
+def load_env_manually(filepath="/sessions/dazzling-relaxed-bardeen/mnt/sprint-smu/.env"):
     if os.path.exists(filepath):
+        print(f"Loading .env from {filepath}")
         with open(filepath, "r") as f:
             for line in f:
                 if "=" in line:
@@ -18,6 +19,7 @@ def load_env_manually(filepath="/sessions/nice-beautiful-tesla/mnt/sprint-smu/.e
                         continue
                     key, value = line.split("=", 1)
                     os.environ[key.strip()] = value.strip()
+                    print(f"Loaded {key.strip()}")
     else:
         print(f"Warning: .env file not found at {filepath}")
 

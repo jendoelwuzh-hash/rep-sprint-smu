@@ -106,9 +106,9 @@ const PHYSICS_GRADES = [
         ] },
 ];
 const SUBJECTS = [
-    { id: "matematika", label: "Matematika", emoji: "\u2211", grades: MATH_GRADES },
-    { id: "kimia", label: "Kimia", emoji: "\uD83E\uDDEA", grades: KIMIA_GRADES },
-    { id: "fisika", label: "Fisika", emoji: "\u269B\uFE0F", grades: PHYSICS_GRADES },
+    { id: "matematika", label: "Matematika", emoji: "∑", grades: MATH_GRADES },
+    { id: "kimia", label: "Kimia", emoji: "🧪", grades: KIMIA_GRADES },
+    { id: "fisika", label: "Fisika", emoji: "⚛️", grades: PHYSICS_GRADES },
 ].map((s) => ({
     ...s,
     grades: s.grades.map((g) => ({ ...g, units: g.units.map((u) => ({ ...u, grade: g.id, subject: s.id })) })),
@@ -124,29 +124,29 @@ const BASE_RULES = "Jawab dalam Bahasa Indonesia. JANGAN pakai LaTeX ($...$) ata
     "Untuk reaksi kimia, tulis tanda panah sebagai '->' (satu arah) atau '<->' (kesetimbangan). " +
     "Paragraf pendek, boleh pakai baris baru dan penomoran biasa (1. 2. 3.).";
 const AGENTS = [
-    { id: "sabar", name: "Guru Sabar", tagline: "Jelasin pelan, langkah demi langkah", emoji: "\uD83D\uDCD6", color: "#22D3EE",
+    { id: "sabar", name: "Guru Sabar", tagline: "Jelasin pelan, langkah demi langkah", emoji: "📖", color: "#22D3EE",
         system: "Kamu 'Guru Sabar', tutor matematika, kimia & fisika yang telaten. Jelaskan konsep secara bertahap dan runtut, bernomor (1), (2), (3), " +
             "pastikan tiap langkah masuk akal dan disertai alasan singkat kenapa langkah itu diambil, sebelum lanjut ke langkah berikutnya. " +
             "Sering cek pemahaman dengan pertanyaan ringan. Setelah siswa paham cara standarnya, boleh tunjukkan satu trik/cara cepat sebagai tambahan opsional, " +
             "tapi jangan sampai bikin bingung — pemahaman konsep tetap prioritas utama. Nada hangat dan sabar." },
-    { id: "santai", name: "Teman Belajar", tagline: "Ngobrol santai kayak sama temen", emoji: "\u2615", color: "#FB923C",
+    { id: "santai", name: "Teman Belajar", tagline: "Ngobrol santai kayak sama temen", emoji: "☕", color: "#FB923C",
         system: "Kamu 'Teman Belajar', teman sebaya yang jago matematika, kimia, dan fisika. Gaya bahasa santai, kadang pakai analogi sehari-hari, " +
             "tidak formal, tapi tetap akurat dan langkahnya tetap runtut biar gampang diikuti. Kalau ada trik atau cara pintas yang beneran ngebantu, " +
             "kasih tau juga dengan gaya santai (mis. 'nah ini triknya biar cepet...'). Hindari nada menggurui." },
-    { id: "kilat", name: "Guru Kilat", tagline: "Rumus cepat & trik jitu, tanpa basa-basi", emoji: "\u26A1", color: "#FBBF24",
+    { id: "kilat", name: "Guru Kilat", tagline: "Rumus cepat & trik jitu, tanpa basa-basi", emoji: "⚡", color: "#FBBF24",
         system: "Kamu 'Guru Kilat'. Jawab singkat dan padat: langsung sebutkan rumus atau trik tercepat untuk soal ini (bukan cara panjang dulu), " +
             "lalu langkah inti bernomor secukupnya, lalu hasil akhir. Kalau ada cara cepat khas ujian (eliminasi opsi, substitusi angka, pola bilangan), " +
             "utamakan itu di atas cara manual. Tidak bertele-tele, maksimal beberapa baris kecuali diminta detail." },
-    { id: "kuis", name: "Kuis Master", tagline: "Nanya-nanya interaktif, kasih skor", emoji: "\uD83D\uDCDD", color: "#34D399",
+    { id: "kuis", name: "Kuis Master", tagline: "Nanya-nanya interaktif, kasih skor", emoji: "📝", color: "#34D399",
         system: "Kamu 'Kuis Master'. Ajukan satu soal latihan pada satu waktu sesuai topik yang diminta, tunggu jawaban siswa, " +
             "lalu koreksi dengan tegas tapi suportif dan beri skor/semangat. Setelah koreksi, tunjukkan ringkas langkah pengerjaan yang benar secara bernomor, " +
             "dan kalau relevan sebutkan satu trik cepat yang bisa dipakai untuk soal sejenis lain kali. Jangan beri semua soal sekaligus." },
-    { id: "hots", name: "Soal HOTS", tagline: "Bikin soal susah level rebutan ranking", emoji: "\uD83E\uDDE0", color: "#F472B6",
+    { id: "hots", name: "Soal HOTS", tagline: "Bikin soal susah level rebutan ranking", emoji: "🧠", color: "#F472B6",
         system: "Kamu 'Agen Soal HOTS'. Buatkan SATU soal Higher Order Thinking Skills (multi-langkah, analitis, sering gabungan " +
             "beberapa konsep atau soal cerita non-rutin) untuk topik yang diminta, setingkat soal seleksi/olimpiade sekolah unggulan. " +
             "Tampilkan HANYA soalnya dulu. Jangan berikan pembahasan atau jawaban kecuali siswa memintanya secara eksplisit (misal 'kasih pembahasan'). " +
             "Kalau diminta pembahasan, jelaskan langkah bernomor secara lengkap DAN, kalau ada, sebutkan cara/trik yang lebih cepat dibanding cara panjangnya." },
-    { id: "trik", name: "Master Trik", tagline: "Bongkar semua trik & cara pintas ujian", emoji: "\uD83C\uDFAF", color: "#A78BFA",
+    { id: "trik", name: "Master Trik", tagline: "Bongkar semua trik & cara pintas ujian", emoji: "☼", color: "#A78BFA",
         system: "Kamu 'Master Trik', ahli semua rumus cepat, trik, dan cara pintas matematika, kimia & fisika ala kakak kelas juara olimpiade. " +
             "Untuk tiap soal yang ditanyakan, SELALU tunjukkan dua bagian dengan jelas: " +
             "'Cara Standar' — langkah baku bernomor sesuai kurikulum sekolah; lalu 'Cara Cepat / Trik' — cara pintas, eliminasi opsi, pola hafalan, " +
@@ -198,7 +198,7 @@ function serializeMessages(messages) {
 function deserializeMessages(saved) {
     return (saved || []).map((m) => ({
         role: m.role,
-        text: m.hadImage ? m.text + "\n\n(\uD83D\uDCF7 foto soal dari sesi sebelumnya, tidak tersimpan setelah ditutup)" : m.text,
+        text: m.hadImage ? m.text + "\n\n(📷 foto soal dari sesi sebelumnya, tidak tersimpan setelah ditutup)" : m.text,
     }));
 }
 function buildHelpSummary(unit, agent, messages) {
@@ -234,7 +234,7 @@ function MathLine({ text }) {
             parts.push(text.slice(lastIndex, m.index));
         if (m[1] !== undefined) {
             parts.push(React.createElement("span", { key: key++, style: { whiteSpace: "nowrap" } },
-                "\u221A",
+                "√",
                 React.createElement("span", { style: { borderTop: "1.3px solid currentColor", padding: "0 2px" } }, m[2])));
         }
         else if (m[3] !== undefined) {
@@ -250,10 +250,10 @@ function MathLine({ text }) {
                 React.createElement("sub", { style: { fontSize: "0.72em" } }, c)));
         }
         else if (m[7] !== undefined) {
-            parts.push(React.createElement("span", { key: key++ }, "\u21CC"));
+            parts.push(React.createElement("span", { key: key++ }, "⇄"));
         }
         else if (m[8] !== undefined) {
-            parts.push(React.createElement("span", { key: key++ }, "\u2192"));
+            parts.push(React.createElement("span", { key: key++ }, "→"));
         }
         else if (m[9] !== undefined) {
             parts.push(React.createElement("span", { key: key++, style: { display: "inline-flex", flexDirection: "column", alignItems: "center", verticalAlign: "middle", fontSize: "0.82em", lineHeight: 1.15, margin: "0 2px" } },
@@ -288,7 +288,7 @@ function MathText({ text }) {
     }
 
     const lines = (text || "").split("\n");
-    return React.createElement("div", { ref: containerRef }, lines.map((line, i) => React.createElement("div", { key: i, style: { minHeight: line ? undefined : 8 } }, line ? React.createElement(MathLine, { text: line }) : "\u00A0")));
+    return React.createElement("div", { ref: containerRef }, lines.map((line, i) => React.createElement("div", { key: i, style: { minHeight: line ? undefined : 8 } }, line ? React.createElement(MathLine, { text: line }) : " ")));
 }
 // ---------------------------------------------------------------------------
 // UI atoms
@@ -577,11 +577,11 @@ function App() {
                 React.createElement("div", { style: { fontSize: 12, color: "#94A3B8", marginTop: 2 } }, "Matematika, Kimia & Fisika kelas 10-12, tanpa terasa belajar manual")),
             React.createElement("div", { style: { display: "flex", gap: 6 } },
                 React.createElement(Pill, { style: { background: "rgba(251,146,60,0.15)", color: "#FDBA74" } },
-                    "\uD83D\uDD25",
+                    "🔥",
                     " ",
                     progress.streak),
                 React.createElement(Pill, { style: { background: "rgba(34,211,238,0.15)", color: "#67E8F9" } },
-                    "\u2728",
+                    "✨",
                     " ",
                     progress.xp,
                     " XP"))),
@@ -590,7 +590,7 @@ function App() {
             tab === "home" && (React.createElement(HomeTab, { progress: progress, activeSubject: activeSubject, setActiveSubject: setActiveSubject, activeGrade: activeGrade, setActiveGrade: setActiveGrade, onOpenUnit: (unit) => openChat(unit, AGENTS[0]), card: card, border: border })),
             tab === "camera" && (React.createElement(CameraTab, { scanImage: scanImage, scanResult: scanResult, scanning: scanning, imagesOk: imagesOk, sampleReady: !!sampleFn, onPick: () => fileInputRef.current && fileInputRef.current.click(), onRemove: () => { setScanImage(null); setScanResult(null); }, onScan: runScan, onDiscuss: discussScan, onGoToTutor: () => setTab(activeUnit || messages.length ? "tutor" : "agents"), card: card, border: border })),
             tab === "agents" && (React.createElement(AgentsTab, { onPick: (agent) => openChat(activeUnit, agent), card: card, border: border })),
-            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: input, setInput: setInput, onSend: () => send(), scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
+            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: input, scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
             tab === "progress" && React.createElement(ProgressTab, { progress: progress, card: card, border: border }))),
         React.createElement("input", { ref: fileInputRef, id: "camera-file-input", type: "file", accept: "image/*", onChange: handlePickPhoto, style: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 } }),
         helpSummary !== null && (React.createElement("div", { style: { position: "absolute", inset: 0, background: "rgba(5,9,20,0.85)", zIndex: 50, display: "flex", alignItems: wide ? "center" : "flex-end", justifyContent: "center" } },
@@ -598,22 +598,22 @@ function App() {
                     ? { width: "100%", maxWidth: 520, background: card, border: "1px solid " + border, borderRadius: 18, padding: 18 }
                     : { width: "100%", background: card, borderTop: "1px solid " + border, borderRadius: "18px 18px 0 0", padding: 18 } },
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } },
-                    React.createElement("span", null, "\u2753"),
+                    React.createElement("span", null, "❓"),
                     React.createElement("div", { style: { fontWeight: 800, fontSize: 14.5 } }, "Ringkasan buat kakak")),
                 React.createElement("div", { style: { fontSize: 11.5, color: "#94A3B8", marginBottom: 10 } }, "Lengkapi bagian bingungnya, lalu salin atau kirim langsung ke WhatsApp."),
                 React.createElement("textarea", { value: helpSummary, onChange: (e) => setHelpSummary(e.target.value), rows: 7, style: { width: "100%", background: "#0B1224", border: "1px solid " + border, borderRadius: 10, padding: 12, color: "#E2E8F0", fontSize: 12.5, lineHeight: 1.5, resize: "vertical", outline: "none" } }),
                 React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 12 } },
-                    React.createElement("button", { onClick: () => { navigator.clipboard && navigator.clipboard.writeText(helpSummary).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(() => { }); }, style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#22D3EE", color: "#04222B", border: "none", borderRadius: 10, padding: "11px 0", fontWeight: 700, fontSize: 13, cursor: "pointer" } }, copied ? "\u2705 Disalin" : "\uD83D\uDCCB Salin teks"),
-                    React.createElement("button", { onClick: () => window.open("https://wa.me/?text=" + encodeURIComponent(helpSummary), "_blank"), style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#34D399", color: "#04231A", border: "none", borderRadius: 10, padding: "11px 0", fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "\uD83D\uDCAC WhatsApp")),
+                    React.createElement("button", { onClick: () => { navigator.clipboard && navigator.clipboard.writeText(helpSummary).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(() => { }); }, style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#22D3EE", color: "#04222B", border: "none", borderRadius: 10, padding: "11px 0", fontWeight: 700, fontSize: 13, cursor: "pointer" } }, copied ? "✅ Disalin" : "📋 Salin teks"),
+                    React.createElement("button", { onClick: () => window.open("https://wa.me/?text=" + encodeURIComponent(helpSummary), "_blank"), style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#34D399", color: "#04231A", border: "none", borderRadius: 10, padding: "11px 0", fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "💬 WhatsApp")),
                 React.createElement("button", { onClick: () => setHelpSummary(null), style: { width: "100%", marginTop: 8, background: "none", border: "none", color: "#94A3B8", fontSize: 12.5, padding: "8px 0", cursor: "pointer" } }, "Tutup")))),
         React.createElement("div", { style: wide
                 ? { gridColumn: 1, gridRow: "1 / span 2", display: "flex", flexDirection: "column", gap: 6, padding: "20px 14px", borderRight: "1px solid " + border, background: "#0D1428", overflowY: "auto" }
                 : { display: "flex", borderTop: "1px solid " + border, background: "#0D1428", flexShrink: 0, paddingBottom: "env(safe-area-inset-bottom, 6px)" } },
             wide && (React.createElement("div", { style: { fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#64748B", padding: "2px 14px 10px" } }, "MENU")),
-            React.createElement(NavBtn, { side: wide, emoji: "\uD83C\uDFE0", label: "Beranda", active: tab === "home", onClick: () => setTab("home") }),
-            React.createElement(NavBtn, { side: wide, emoji: "\uD83D\uDCF7", label: "Kamera", active: tab === "camera", onClick: () => setTab("camera") }),
-            React.createElement(NavBtn, { side: wide, emoji: "\uD83C\uDF93", label: "Tutor", active: tab === "tutor" || tab === "agents", onClick: () => setTab(activeUnit || messages.length ? "tutor" : "agents") }),
-            React.createElement(NavBtn, { side: wide, emoji: "\uD83D\uDCCA", label: "Progres", active: tab === "progress", onClick: () => setTab("progress") }))));
+            React.createElement(NavBtn, { side: wide, emoji: "🏠", label: "Beranda", active: tab === "home", onClick: () => setTab("home") }),
+            React.createElement(NavBtn, { side: wide, emoji: "📷", label: "Kamera", active: tab === "camera", onClick: () => setTab("camera") }),
+            React.createElement(NavBtn, { side: wide, emoji: "🎓", label: "Tutor", active: tab === "tutor" || tab === "agents", onClick: () => setTab(activeUnit || messages.length ? "tutor" : "agents") }),
+            React.createElement(NavBtn, { side: wide, emoji: "📊", label: "Progres", active: tab === "progress", onClick: () => setTab("progress") }))));
 }
 function HomeTab({ progress, activeSubject, setActiveSubject, activeGrade, setActiveGrade, onOpenUnit, card, border }) {
     const subject = SUBJECTS.find((s) => s.id === activeSubject) || SUBJECTS[0];
@@ -653,18 +653,18 @@ function HomeTab({ progress, activeSubject, setActiveSubject, activeGrade, setAc
         })),
         React.createElement("div", { style: { marginTop: 22, background: card, border: "1px solid " + border, borderRadius: 14, padding: 16 } },
             React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 } },
-                React.createElement("span", null, "\uD83C\uDFC6"),
+                React.createElement("span", null, "🏆"),
                 React.createElement("span", { style: { fontWeight: 700, fontSize: 13.5 } }, "Mau soal susah buat kejar ranking?")),
-            React.createElement("div", { style: { fontSize: 12.5, color: "#94A3B8", lineHeight: 1.5 } }, "Coba agen \"Soal HOTS\" di tab Tutor \u2014 bikinin soal setingkat seleksi sekolah unggulan, lengkap sama pembahasan kalau diminta."))));
+            React.createElement("div", { style: { fontSize: 12.5, color: "#94A3B8", lineHeight: 1.5 } }, "Coba agen \"Soal HOTS\" di tab Tutor — bikinin soal setingkat seleksi sekolah unggulan, lengkap sama pembahasan kalau diminta."))));
 }
 function CameraTab({ scanImage, scanResult, scanning, imagesOk, sampleReady, onPick, onRemove, onScan, onDiscuss, onGoToTutor, card, border }) {
     if (sampleReady && !imagesOk) {
         return (React.createElement("div", null,
             React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#94A3B8", marginBottom: 10 } }, "Foto soal sekolah"),
             React.createElement("div", { style: { background: card, border: "1px solid " + border, borderRadius: 16, padding: "32px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, textAlign: "center" } },
-                React.createElement("span", { style: { fontSize: 30 } }, "\uD83D\uDCF7"),
+                React.createElement("span", { style: { fontSize: 30 } }, "📷"),
                 React.createElement("div", { style: { fontWeight: 700, fontSize: 14.5 } }, "Kirim foto ke AI belum didukung di tampilan ini"),
-                React.createElement("div", { style: { fontSize: 12.5, color: "#94A3B8", lineHeight: 1.5 } }, "Ini keterbatasan sementara dari tampilan artifact Claude, bukan dari aplikasinya. Untuk sekarang, ketik atau salin soalnya lewat tab Tutor \u2014 agen tetap bisa bantu jelasin dan kasih langkah pengerjaannya."),
+                React.createElement("div", { style: { fontSize: 12.5, color: "#94A3B8", lineHeight: 1.5 } }, "Ini keterbatasan sementara dari tampilan artifact Claude, bukan dari aplikasinya. Untuk sekarang, ketik atau salin soalnya lewat tab Tutor — agen tetap bisa bantu jelasin dan kasih langkah pengerjaannya."),
                 React.createElement("button", { onClick: onGoToTutor, style: { marginTop: 4, background: "#22D3EE", color: "#04222B", border: "none", borderRadius: 12, padding: "11px 22px", fontWeight: 800, fontSize: 13.5, cursor: "pointer" } }, "Ketik soal di Tutor"))));
     }
     return (React.createElement("div", null,
@@ -680,12 +680,12 @@ function CameraTab({ scanImage, scanResult, scanning, imagesOk, sampleReady, onP
         scanImage && (React.createElement("div", { style: { background: card, border: "1px solid " + border, borderRadius: 16, overflow: "hidden" } },
             React.createElement("div", { style: { position: "relative" } },
                 React.createElement("img", { src: scanImage.previewUrl, alt: "soal", style: { width: "100%", display: "block", maxHeight: 260, objectFit: "cover" } }),
-                React.createElement("button", { onClick: onRemove, style: { position: "absolute", top: 8, right: 8, background: "rgba(11,18,36,0.75)", border: "none", borderRadius: 999, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer" } }, "\u2715")),
+                React.createElement("button", { onClick: onRemove, style: { position: "absolute", top: 8, right: 8, background: "rgba(11,18,36,0.75)", border: "none", borderRadius: 999, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer" } }, "✕")),
             React.createElement("div", { style: { padding: 14 } },
                 !scanResult && (React.createElement("button", { onClick: onScan, disabled: scanning, style: { width: "100%", background: "#22D3EE", color: "#04222B", border: "none", borderRadius: 12, padding: "12px 0", fontWeight: 800, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, scanning ? React.createElement(React.Fragment, null,
                     React.createElement("span", { className: "spinner" }),
-                    " Membaca soal\u2026") : React.createElement(React.Fragment, null,
-                    "\u2728",
+                    " Membaca soal…") : React.createElement(React.Fragment, null,
+                    "✨",
                     " Bahas soal ini"))),
                 scanResult && (React.createElement("div", null,
                     React.createElement("div", { style: { fontSize: 13.5, lineHeight: 1.55, color: "#E2E8F0" } },
@@ -702,19 +702,19 @@ function AgentsTab({ onPick, card, border }) {
             React.createElement("div", { style: { flex: 1 } },
                 React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } }, a.name),
                 React.createElement("div", { style: { fontSize: 11.5, color: "#94A3B8", marginTop: 1 } }, a.tagline)),
-            React.createElement("span", { style: { color: "#475569" } }, "\u203A")))))));
+            React.createElement("span", { style: { color: "#475569" } }, "›")))))));
 }
-function TutorTab({ unit, agent, messages, pending, error, input, setInput, onSend, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
+function TutorTab({ unit, agent, messages, pending, error, input, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
     const showTransformation = unit && unit.id === 'mat-11-transformasi';
     return (React.createElement("div", { style: { display: "flex", flexDirection: "column", height: "100%" } },
         React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 } },
-            React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4, fontSize: 16 } }, "\u2190"),
+            React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4, fontSize: 16 } }, "←"),
             React.createElement("div", { style: { flex: 1 } },
                 React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } },
                     agent.name,
                     unit ? " · " + unit.title : ""),
                 React.createElement("div", { style: { fontSize: 11, color: "#94A3B8" } }, agent.tagline)),
-            messages.length > 0 && (React.createElement("button", { onClick: onClearHistory, title: "Hapus riwayat topik ini", style: { background: "none", border: "none", color: "#64748B", cursor: "pointer", padding: 4 } }, "\uD83D\uDDD1\uFE0F")),
+            messages.length > 0 && (React.createElement("button", { onClick: onClearHistory, title: "Hapus riwayat topik ini", style: { background: "none", border: "none", color: "#64748B", cursor: "pointer", padding: 4 } }, "🗑️")),
             React.createElement("select", { value: agent.id, onChange: (e) => onChangeAgent(AGENTS.find((a) => a.id === e.target.value)), style: { background: card, color: "#E2E8F0", border: "1px solid " + border, borderRadius: 8, fontSize: 11.5, padding: "6px 8px" } }, AGENTS.map((a) => React.createElement("option", { key: a.id, value: a.id }, a.name))),
         ),
 
@@ -733,27 +733,27 @@ function TutorTab({ unit, agent, messages, pending, error, input, setInput, onSe
                 React.createElement("span", { className: "spinner" })),
             error && React.createElement("div", { style: { color: "#FCA5A5", fontSize: 12 } }, error)),
         messages.length > 0 && (React.createElement("button", { onClick: onAskHuman, style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", background: "rgba(244,114,182,0.12)", color: "#F9A8D4", border: "1px solid rgba(244,114,182,0.3)", borderRadius: 10, padding: "9px 0", fontSize: 12.5, fontWeight: 600, cursor: "pointer", marginBottom: 8 } },
-            "\u2753",
+            "❓",
             " Bingung, minta dijelasin manusia")),
         React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("input", { value: input, onChange: (e) => setInput(e.target.value), onKeyDown: (e) => { if (e.key === "Enter")
-                    onSend(); }, placeholder: "Tulis pertanyaan\u2026", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
-            React.createElement("button", { onClick: onSend, disabled: pending || !input.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !input.trim() ? 0.5 : 1 } }, "\u27A4"))));
+            React.createElement("input", { value: input, onChange: handleInputChange, onKeyDown: (e) => { if (e.key === "Enter")
+                    handleSubmit(e); }, placeholder: "Tulis pertanyaan…", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
+            React.createElement("button", { onClick: handleSubmit, disabled: pending || !input.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !input.trim() ? 0.5 : 1 } }, "➤"))));
 }
 function ProgressTab({ progress, card, border }) {
     const totalMastery = ALL_UNITS.reduce((s, u) => s + ((progress.units[u.id] && progress.units[u.id].mastery) || 0), 0) / ALL_UNITS.length;
     return (React.createElement("div", null,
         React.createElement("div", { style: { display: "flex", gap: 10, marginBottom: 16 } },
             React.createElement("div", { style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 14, padding: 16, textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 18 } }, "\uD83D\uDD25"),
+                React.createElement("div", { style: { fontSize: 18 } }, "🔥"),
                 React.createElement("div", { style: { fontSize: 22, fontWeight: 800 } }, progress.streak),
                 React.createElement("div", { style: { fontSize: 11, color: "#94A3B8" } }, "Hari beruntun")),
             React.createElement("div", { style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 14, padding: 16, textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 18 } }, "\u2728"),
+                React.createElement("div", { style: { fontSize: 18 } }, "✨"),
                 React.createElement("div", { style: { fontSize: 22, fontWeight: 800 } }, progress.xp),
                 React.createElement("div", { style: { fontSize: 11, color: "#94A3B8" } }, "Total XP")),
             React.createElement("div", { style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 14, padding: 16, textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 18 } }, "\u2705"),
+                React.createElement("div", { style: { fontSize: 18 } }, "✅"),
                 React.createElement("div", { style: { fontSize: 22, fontWeight: 800 } },
                     Math.round(totalMastery),
                     "%"),
