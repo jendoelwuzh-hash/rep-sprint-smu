@@ -174,13 +174,13 @@ function BarDiagram({ spec, accent }: { spec: DiagramSpec; accent: string }) {
 const SHAPE_NAMES = ['circle', 'triangle', 'rectangle', 'square', 'polygon'];
 
 export function DiagramBlock({ spec, accent }: DiagramBlockProps) {
-  const type = (spec.type || '').toLowerCase().trim();
+  const type = (spec.type || '').toString().toLowerCase().trim();
 
   if (type === 'coordinate') return <CoordinatePlane spec={spec} accent={accent} />;
   if (type === 'numberline' || type === 'number-line' || type === 'number_line') return <NumberLineDiagram spec={spec} accent={accent} />;
   if (type === 'bar') return <BarDiagram spec={spec} accent={accent} />;
   if (type === 'shape' || SHAPE_NAMES.includes(type)) {
-    const shape = (spec.shape || type || '').toLowerCase().trim();
+    const shape = (spec.shape || type || '').toString().toLowerCase().trim();
     return <ShapeDiagram spec={{ ...spec, shape }} accent={accent} />;
   }
   return null;
