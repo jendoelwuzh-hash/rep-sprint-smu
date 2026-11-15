@@ -748,9 +748,9 @@ function TutorTab({ unit, agent, messages, pending, error, input = "", handleInp
             "❓",
             " Bingung, minta dijelasin manusia")),
         React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("input", { value: input, onChange: handleInputChange, onKeyDown: (e) => { if (e.key === "Enter")
-                    handleSubmit(e); }, placeholder: "Tulis pertanyaan…", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
-            React.createElement("button", { onClick: handleSubmit, disabled: pending || !input.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !input.trim() ? 0.5 : 1 } }, "➤"))));
+            React.createElement("input", { value: manualInput, onChange: handleManualInputChange, onKeyDown: (e) => { if (e.key === "Enter")
+                    handleManualSubmit(); }, placeholder: "Tulis pertanyaan…", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
+            React.createElement("button", { onClick: handleManualSubmit, disabled: pending || !manualInput.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !manualInput.trim() ? 0.5 : 1 } }, "➤"))));
 }
 function ProgressTab({ progress, card, border }) {
     const totalMastery = ALL_UNITS.reduce((s, u) => s + ((progress.units[u.id] && progress.units[u.id].mastery) || 0), 0) / ALL_UNITS.length;
