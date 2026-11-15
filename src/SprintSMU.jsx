@@ -451,18 +451,18 @@ function App() {
         }
     });
 
-    const { messages, input, handleSubmit, isLoading: pending, append } = chatHook;
+    const { messages, isLoading: pending, append, setMessages } = chatHook;
+    const [manualInput, setManualInput] = useState("");
 
-    // Implementasi handleInputChange mandiri yang aman
-    const handleInputChange = useCallback((e) => {
-        if (chatHook && typeof chatHook.handleInputChange === 'function') {
-            chatHook.handleInputChange(e);
-        } else if (chatHook && typeof chatHook.setInput === 'function') {
-            chatHook.setInput(e.target.value);
-        } else {
-            console.error("handleInputChange/setInput tidak tersedia di chatHook:", chatHook);
-        }
-    }, [chatHook]);
+    const handleManualInputChange = (e) => {
+        setManualInput(e.target.value);
+    };
+
+    const handleManualSubmit = async () => {
+        if (!manualInput.trim()) return;
+        await send(manualInput);
+        setManualInput("");
+    };
 
     const [error, setError] = useState(null);
     const [scanImage, setScanImage] = useState(null); // {file, previewUrl}
@@ -503,7 +503,7 @@ function App() {
     }, []);
 
     const send = useCallback(async (overrideText) => {
-        const text = (overrideText !== undefined ? overrideText : input).trim();
+        const text = (overrideText !== undefined ? overrideText : manualInput).trim();
         if (!text) return;
 
         const instructionText = [
@@ -520,7 +520,7 @@ function App() {
         await append({ role: 'user', content: `${instructionText}\n\n${text}` });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
-    }, [input, activeAgent, activeUnit, append]);
+    }, [manualInput, activeAgent, activeUnit, append]);
     const handlePickPhoto = (e) => {
         const file = e.target.files && e.target.files[0];
         e.target.value = "";
@@ -602,7 +602,7 @@ function App() {
             tab === "home" && (React.createElement(HomeTab, { progress: progress, activeSubject: activeSubject, setActiveSubject: setActiveSubject, activeGrade: activeGrade, setActiveGrade: setActiveGrade, onOpenUnit: (unit) => openChat(unit, AGENTS[0]), card: card, border: border })),
             tab === "camera" && (React.createElement(CameraTab, { scanImage: scanImage, scanResult: scanResult, scanning: scanning, imagesOk: imagesOk, sampleReady: !!sampleFn, onPick: () => fileInputRef.current && fileInputRef.current.click(), onRemove: () => { setScanImage(null); setScanResult(null); }, onScan: runScan, onDiscuss: discussScan, onGoToTutor: () => setTab(activeUnit || messages.length ? "tutor" : "agents"), card: card, border: border })),
             tab === "agents" && (React.createElement(AgentsTab, { onPick: (agent) => openChat(activeUnit, agent), card: card, border: border })),
-            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: input || "", handleInputChange: handleInputChange, handleSubmit: handleSubmit, scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
+            tab === "tutor" && (React.createElement(TutorTab, { unit: activeUnit, agent: activeAgent, messages: messages, pending: pending, error: error, input: manualInput, handleInputChange: handleManualInputChange, handleSubmit: handleManualSubmit, scrollRef: scrollRef, onChangeAgent: (a) => { setActiveAgent(a); setMessages(deserializeMessages(histories[sessionKey(activeUnit, a)])); }, onBack: () => setTab("home"), onAskHuman: () => setHelpSummary(buildHelpSummary(activeUnit, activeAgent, messages)), onClearHistory: () => setMessages([]), card: card, border: border })),
             tab === "progress" && React.createElement(ProgressTab, { progress: progress, card: card, border: border }))),
         React.createElement("input", { ref: fileInputRef, id: "camera-file-input", type: "file", accept: "image/*", onChange: handlePickPhoto, style: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 } }),
         helpSummary !== null && (React.createElement("div", { style: { position: "absolute", inset: 0, background: "rgba(5,9,20,0.85)", zIndex: 50, display: "flex", alignItems: wide ? "center" : "flex-end", justifyContent: "center" } },
