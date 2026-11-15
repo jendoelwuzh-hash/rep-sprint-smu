@@ -558,9 +558,11 @@ function App() {
         const guess = ALL_UNITS.find((u) => scanResult && scanResult.toLowerCase().includes(u.title.toLowerCase())) || null;
         setActiveUnit(guess);
         setActiveAgent(AGENTS[0]);
-        setMessages([
-            { role: "user", text: "Ini soal yang tadi aku foto." },
-            { role: "assistant", text: scanResult },
+        // Perbaikan: setMessages menerima array pesan, bukan fungsi
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", content: "Ini soal yang tadi aku foto." },
+            { role: "assistant", content: scanResult },
         ]);
         setScanImage(null);
         setScanResult(null);
