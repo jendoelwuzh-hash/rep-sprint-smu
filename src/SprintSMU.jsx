@@ -454,12 +454,18 @@ function App() {
     const { messages, isLoading: pending, append, setMessages } = chatHook;
     const [manualInput, setManualInput] = useState("");
 
+    // Tambahkan log untuk debug
+    useEffect(() => {
+        console.log("chatHook:", chatHook);
+    }, [chatHook]);
+
     const handleManualInputChange = (e) => {
         setManualInput(e.target.value);
     };
 
     const handleManualSubmit = async () => {
-        if (!manualInput.trim()) return;
+        if (!manualInput || !manualInput.trim()) return;
+        // Gunakan setManualInput("") setelah berhasil send
         await send(manualInput);
         setManualInput("");
     };
