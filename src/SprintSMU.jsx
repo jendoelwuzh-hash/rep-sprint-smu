@@ -2,8 +2,8 @@ import { InteractiveVisualizer } from './components/InteractiveMath';
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useChat } from '@ai-sdk/react';
 import "./sprint-smu.css";
-import { useAuth } from './context/AuthContext'; // Import useAuth
-import { supabase } from './lib/supabaseClient'; // TAMBAHKAN INI
+import { useAuth } from './context/AuthContext';
+import { supabase } from './lib/supabaseClient';
 
 // ---------------------------------------------------------------------------
 // Static data: subjects -> grades -> units
@@ -454,18 +454,12 @@ function App() {
     const { messages, isLoading: pending, append, setMessages } = chatHook;
     const [manualInput, setManualInput] = useState("");
 
-    // Tambahkan log untuk debug
-    useEffect(() => {
-        console.log("chatHook:", chatHook);
-    }, [chatHook]);
-
     const handleManualInputChange = (e) => {
         setManualInput(e.target.value);
     };
 
     const handleManualSubmit = async () => {
         if (!manualInput || !manualInput.trim()) return;
-        // Gunakan setManualInput("") setelah berhasil send
         await send(manualInput);
         setManualInput("");
     };
@@ -508,8 +502,8 @@ function App() {
         setTab("tutor");
     }, []);
 
-    const send = useCallback(async (overrideText) => {
-        const text = (overrideText !== undefined ? overrideText : manualInput).trim();
+    const send = useCallback(async (textToSend) => {
+        const text = (textToSend || "").trim();
         if (!text) return;
 
         const instructionText = [
@@ -526,7 +520,8 @@ function App() {
         await append({ role: 'user', content: `${instructionText}\n\n${text}` });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
-    }, [manualInput, activeAgent, activeUnit, append]);
+    }, [activeAgent, activeUnit, append]);
+
     const handlePickPhoto = (e) => {
         const file = e.target.files && e.target.files[0];
         e.target.value = "";
@@ -725,7 +720,6 @@ function AgentsTab({ onPick, card, border }) {
             React.createElement("span", { style: { color: "#475569" } }, "›")))))));
 }
 function TutorTab({ unit, agent, messages, pending, error, input = "", handleInputChange, handleSubmit, scrollRef, onChangeAgent, onBack, onAskHuman, onClearHistory, card, border }) {
-    const showTransformation = unit && unit.id === 'mat-11-transformasi';
     return (React.createElement("div", { style: { display: "flex", flexDirection: "column", height: "100%" } },
         React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 } },
             React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4, fontSize: 16 } }, "←"),
@@ -737,11 +731,9 @@ function TutorTab({ unit, agent, messages, pending, error, input = "", handleInp
             messages.length > 0 && (React.createElement("button", { onClick: onClearHistory, title: "Hapus riwayat topik ini", style: { background: "none", border: "none", color: "#64748B", cursor: "pointer", padding: 4 } }, "🗑️")),
             React.createElement("select", { value: agent.id, onChange: (e) => onChangeAgent(AGENTS.find((a) => a.id === e.target.value)), style: { background: card, color: "#E2E8F0", border: "1px solid " + border, borderRadius: 8, fontSize: 11.5, padding: "6px 8px" } }, AGENTS.map((a) => React.createElement("option", { key: a.id, value: a.id }, a.name))),
         ),
-
         unit && React.createElement("div", { style: { marginBottom: 10 } },
             React.createElement(InteractiveVisualizer, { unitId: unit.id })
         ),
-
         React.createElement("div", { ref: scrollRef, style: { flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, paddingBottom: 10 } },
             messages.length === 0 && (React.createElement("div", { style: { background: card, border: "1px solid " + border, borderRadius: 12, padding: 14, fontSize: 12.5, color: "#94A3B8", display: "flex", gap: 8 } },
                 React.createElement("span", null, agent.emoji),
@@ -756,9 +748,9 @@ function TutorTab({ unit, agent, messages, pending, error, input = "", handleInp
             "❓",
             " Bingung, minta dijelasin manusia")),
         React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("input", { value: manualInput, onChange: handleManualInputChange, onKeyDown: (e) => { if (e.key === "Enter")
-                    handleManualSubmit(); }, placeholder: "Tulis pertanyaan…", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
-            React.createElement("button", { onClick: handleManualSubmit, disabled: pending || !manualInput.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !manualInput.trim() ? 0.5 : 1 } }, "➤"))));
+            React.createElement("input", { value: input, onChange: handleInputChange, onKeyDown: (e) => { if (e.key === "Enter")
+                    handleSubmit(e); }, placeholder: "Tulis pertanyaan…", style: { flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" } }),
+            React.createElement("button", { onClick: handleSubmit, disabled: pending || !input.trim(), style: { width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !input.trim() ? 0.5 : 1 } }, "➤"))));
 }
 function ProgressTab({ progress, card, border }) {
     const totalMastery = ALL_UNITS.reduce((s, u) => s + ((progress.units[u.id] && progress.units[u.id].mastery) || 0), 0) / ALL_UNITS.length;
