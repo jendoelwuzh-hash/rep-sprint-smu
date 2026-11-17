@@ -6,7 +6,7 @@ import { useAuth } from './context/AuthContext';
 import { supabase } from './lib/supabaseClient';
 
 // Import refactored modules
-import { SUBJECTS, AGENTS, ALL_UNITS, STUDENT_CONTEXT, BASE_RULES, DEFAULT_PROGRESS } from './data/subjects';
+import { SUBJECTS, AGENTS, ALL_UNITS, STUDENT_CONTEXT, BASE_RULES, DEFAULT_PROGRESS } from './data/subjects.js';
 import { loadJSON, saveJSON, sessionKey, deserializeMessages, buildHelpSummary } from './utils/helpers';
 import { MathText } from './components/MathText.jsx';
 import { Pill, NavBtn, useIsWide } from './components/UI.jsx';
