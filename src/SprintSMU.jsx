@@ -33,7 +33,7 @@ function App() {
         }
     });
 
-    const { messages = [], isLoading: pending, sendMessage, setMessages } = chatHook;
+        const { messages = [], isLoading: pending, sendMessage, setMessages } = chatHook;
     const { scanImage, setScanImage, scanResult, setScanResult, scanning, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress);
 
     const [manualInput, setManualInput] = useState("");
