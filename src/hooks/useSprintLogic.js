@@ -12,6 +12,11 @@ export function useSprintLogic(activeAgent, activeUnit, setProgress, { append, s
     const send = useCallback(async (text, profile) => {
         if (!text.trim()) return;
 
+        if (typeof append !== 'function') {
+            console.error('Error: append is not a function in useSprintLogic', append);
+            return;
+        }
+
         await append({ role: 'user', content: text });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
