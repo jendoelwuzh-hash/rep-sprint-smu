@@ -8,7 +8,7 @@ import requests
 # load_dotenv()
 
 # Manually load variables from .env file
-def load_env_manually(filepath="/sessions/dazzling-relaxed-bardeen/mnt/sprint-smu/.env"):
+def load_env_manually(filepath=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")):
     if os.path.exists(filepath):
         print(f"Loading .env from {filepath}")
         with open(filepath, "r") as f:
