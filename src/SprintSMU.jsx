@@ -41,8 +41,9 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Berdasarkan error 'in operator search for text',
-        // SDK ini mewajibkan format { text: "pesan" }
+        // Berdasarkan pemeriksaan kode internal:
+        // SDK mencoba melakukan 'text' in h.
+        // Maka kita WAJIB mengirim objek dengan properti 'text'.
         await sendMessage({ text: text });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
