@@ -7,7 +7,7 @@ import { supabase } from './lib/supabaseClient';
 
 // Import refactored modules
 import { SUBJECTS, AGENTS, ALL_UNITS, STUDENT_CONTEXT, BASE_RULES, DEFAULT_PROGRESS } from './data/subjects';
-import { loadJSON, saveJSON, sessionKey, deserializeMessages, buildHelpSummary } from './utils/helpers';
+import { loadJSON, saveJSON, sessionKey, deserializeMessages, buildHelpSummary, bumpUnit } from './utils/helpers';
 import { MathText } from './components/MathText.jsx';
 import { Pill, NavBtn, useIsWide } from './components/UI.jsx';
 import { HomeTab, CameraTab, AgentsTab, TutorTab, ProgressTab } from './components/Tabs.jsx';
