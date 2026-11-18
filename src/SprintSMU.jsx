@@ -31,7 +31,7 @@ function App() {
             activeAgentId: activeAgent?.id,
             activeUnitId: activeUnit?.id
         }
-    });
+    }) || { messages: [], isLoading: false, sendMessage: async () => {}, setMessages: () => {} };
 
         const { messages = [], isLoading: pending, sendMessage, setMessages } = chatHook;
     const { scanImage, setScanImage, scanResult, setScanResult, scanning, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress);
