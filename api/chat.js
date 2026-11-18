@@ -36,7 +36,9 @@ export default async function handler(req, res) {
     }));
     if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || "gemini-1.5-flash"}:generateContent?key=${geminiKey}`;
+    // Gunakan model yang didukung secara universal jika GEMINI_MODEL tidak diset
+    const modelName = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
 
     console.log("LOG: Calling Gemini API...");
     const r = await fetch(url, {

@@ -1,7 +1,7 @@
 // Vercel Serverless Function -> /api/vision
 // Analisis gambar menggunakan Gemini API
 
-const GEMINI_MODELS = ["gemini-2.5-flash"];
+const GEMINI_MODELS = [process.env.GEMINI_MODEL, "gemini-2.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.5-flash"].filter(Boolean);
 
 export default async function handler(req, res) {
   const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
