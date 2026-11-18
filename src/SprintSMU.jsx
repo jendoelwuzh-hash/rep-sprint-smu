@@ -104,7 +104,19 @@ function App() {
     }, []);
 
     const discussScan = () => {
-        const guess = ALL_UNITS.find((u) => scanResult && scanResult.toLowerCase().includes(u.title.toLowerCase())) || null;
+        // PERBAIKAN: Tambahkan pengecekan keamanan (guard clause)
+        if (!scanResult || !Array.isArray(ALL_UNITS)) {
+            console.error("DEBUG: discussScan gagal - scanResult atau ALL_UNITS tidak valid", { scanResult, ALL_UNITS });
+            return;
+        }
+
+        const scanResultLower = scanResult.toLowerCase();
+
+        // Cari unit dengan aman
+        const guess = ALL_UNITS.find((u) =>
+            u && u.title && scanResultLower.includes(u.title.toLowerCase())
+        ) || null;
+
         setActiveUnit(guess);
         setActiveAgent(AGENTS[0]);
         setMessages((prev) => [
