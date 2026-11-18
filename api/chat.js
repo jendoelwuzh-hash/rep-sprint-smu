@@ -9,13 +9,14 @@ const PER_TRY_MS = Number(process.env.PER_TRY_MS || 20000); // batas tunggu per 
 const TOTAL_MS = Number(process.env.TOTAL_MS || 50000);     // batas tunggu total
 
 export default async function handler(req, res) {
+  console.log("LOG: API handler dipanggil!");
   const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   // Sentinel: Cek apakah key terbaca
   const keyExists = !!process.env.GEMINI_API_KEY;
-  console.log("Sentinel Check: GEMINI_API_KEY exists?", keyExists);
+  console.log("LOG: Apakah API KEY ada?", keyExists);
 
   if (!keyExists) {
     console.error("CRITICAL: GEMINI_API_KEY is not defined in environment");
@@ -23,7 +24,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    const geminiKey = process.env.GEMINI_API_KEY;
     const { system, messages } = req.body || {};
 
     if (!Array.isArray(messages)) {
@@ -36,9 +36,9 @@ export default async function handler(req, res) {
     }));
     if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${geminiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || "gemini-1.5-flash"}:generateContent?key=${geminiKey}`;
 
-    console.log("Sentinel: Calling Gemini API...");
+    console.log("LOG: Calling Gemini API...");
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,8 +47,8 @@ export default async function handler(req, res) {
 
     // Sentinel: Baca teks dulu
     const responseText = await r.text();
-    console.log("Sentinel: Response status:", r.status);
-    console.log("Sentinel: Raw Response:", responseText);
+    console.log("LOG: Response status:", r.status);
+    console.log("LOG: Raw Response:", responseText);
 
     if (!r.ok) {
       throw new Error(`API Error ${r.status}: ${responseText}`);
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ text: text || "Maaf, AI tidak memberikan jawaban." });
 
   } catch (e) {
-    console.error("Internal Server Error:", e.message);
+    console.error("LOG: ERROR FATAL di API:", e);
     return res.status(500).json({ error: "Internal server error", detail: e.message });
   }
 }
