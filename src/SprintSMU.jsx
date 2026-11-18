@@ -33,6 +33,8 @@ function App() {
         }
     });
 
+    console.log('DEBUG: chatHook content:', chatHook);
+
     const { messages, isLoading: pending, append, setMessages } = chatHook;
     const { scanImage, setScanImage, scanResult, setScanResult, scanning, send, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress, { append, setMessages });
 
