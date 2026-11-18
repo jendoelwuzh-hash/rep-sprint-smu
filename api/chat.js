@@ -1,10 +1,15 @@
 // Vercel Serverless Function -> /api/chat
-const MODEL = "gemini-2.5-flash";
+// Penyedia AI: Gemini API (ada tier gratis dari Google AI Studio)
+
+const VERSION = "v4-gemini";
+// Model Gemini resmi yang didukung:
+const GEMINI_MODELS = [process.env.GEMINI_MODEL, "gemini-2.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.5-flash"].filter(Boolean);
+const MAX_CHARS = 30000;
+const PER_TRY_MS = Number(process.env.PER_TRY_MS || 20000); // batas tunggu per model
+const TOTAL_MS = Number(process.env.TOTAL_MS || 50000);     // batas tunggu total
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
