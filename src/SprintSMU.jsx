@@ -14,6 +14,14 @@ import { HomeTab, CameraTab, AgentsTab, TutorTab, ProgressTab } from './componen
 import { callClaude } from './api/ai.jsx';
 import { useSprintLogic } from './hooks/useSprintLogic';
 
+// Tambahkan fungsi langsung di sini untuk menghindari import error
+function bumpUnit(prog, unitId, xpGain = 8) {
+    const u = prog.units[unitId] || { sessions: 0, mastery: 0 };
+    const sessions = u.sessions + 1;
+    const mastery = Math.min(100, sessions * 12);
+    return { ...prog, xp: prog.xp + xpGain, units: { ...prog.units, [unitId]: { sessions, mastery } } };
+}
+
 function App() {
     const { profile, user } = useAuth();
     const wide = useIsWide();
