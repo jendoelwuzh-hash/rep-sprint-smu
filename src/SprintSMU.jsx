@@ -40,7 +40,8 @@ function App() {
     const handleManualInputChange = (e) => setManualInput(e.target.value);
     const handleSendMessage = async (text, profile) => {
         if (!text.trim()) return;
-        await sendMessage(text);
+        // AI SDK v4 sendMessage might expect a message object
+        await sendMessage({ role: 'user', content: text });
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };
 
