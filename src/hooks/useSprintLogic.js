@@ -12,12 +12,19 @@ export function useSprintLogic(activeAgent, activeUnit, setProgress, { append, s
     const send = useCallback(async (text, profile) => {
         if (!text.trim()) return;
 
-        if (typeof append !== 'function') {
-            console.error('Error: append is not a function in useSprintLogic', append);
-            return;
+        // Pastikan append dipanggil dengan format yang diharapkan SDK versi 4+
+        if (typeof append === 'function') {
+            try {
+                await append({
+                    role: 'user',
+                    content: text
+                });
+            } catch (err) {
+                console.error("Error saat memanggil append:", err);
+            }
+        } else {
+            console.error("Append bukan fungsi:", append);
         }
-
-        await append({ role: 'user', content: text });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     }, [activeUnit, setProgress, append]);
