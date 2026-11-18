@@ -170,7 +170,7 @@ export function TutorTab({ unit, agent, messages, pending, error, input = "", ha
             </div>
             {messages.length > 0 && <button onClick={onAskHuman} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", background: "rgba(244,114,182,0.12)", color: "#F9A8D4", border: "1px solid rgba(244,114,182,0.3)", borderRadius: 10, padding: "9px 0", fontSize: 12.5, fontWeight: 600, cursor: "pointer", marginBottom: 8 }}>❓ Bingung, minta dijelasin manusia</button>}
             <div style={{ display: "flex", gap: 8 }}>
-                <input value={input} onChange={handleInputChange} onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(e); }} placeholder="Tulis pertanyaan…" style={{ flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" }} />
+                <input value={input} onChange={handleInputChange} onKeyDown={(e) => { if (e.key === "Enter" && typeof handleSubmit === 'function') handleSubmit(); }} placeholder="Tulis pertanyaan…" style={{ flex: 1, background: card, border: "1px solid " + border, borderRadius: 12, padding: "11px 14px", color: "#F1F5F9", fontSize: 13.5, outline: "none" }} />
                 <button onClick={handleSubmit} disabled={pending || !input.trim()} style={{ width: 42, height: 42, borderRadius: 12, background: "#22D3EE", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, opacity: pending || !input.trim() ? 0.5 : 1 }}>➤</button>
             </div>
         </div>
