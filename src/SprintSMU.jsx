@@ -33,13 +33,17 @@ function App() {
         }
     });
 
-    console.log('DEBUG: chatHook content:', chatHook);
-
     const { messages, isLoading: pending, append, setMessages } = chatHook;
-    const { scanImage, setScanImage, scanResult, setScanResult, scanning, send, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress, { append, setMessages });
+    const { scanImage, setScanImage, scanResult, setScanResult, scanning, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress);
 
     const [manualInput, setManualInput] = useState("");
     const handleManualInputChange = (e) => setManualInput(e.target.value);
+    const handleSendMessage = async (text, profile) => {
+        if (!text.trim()) return;
+        await append({ role: 'user', content: text });
+        if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
+    };
+
     const handleManualSubmit = async () => {
         if (!manualInput || !manualInput.trim()) return;
 
@@ -54,7 +58,7 @@ function App() {
             BASE_RULES,
         ].filter(Boolean).join("\n\n");
 
-        await send(`${instructionText}\n\n${manualInput}`, profile);
+        await handleSendMessage(`${instructionText}\n\n${manualInput}`, profile);
         setManualInput("");
     };
 

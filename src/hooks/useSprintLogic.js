@@ -4,30 +4,10 @@ import { useChat } from '@ai-sdk/react';
 import { bumpUnit } from '../utils/helpers';
 import { callVision } from '../api/ai';
 
-export function useSprintLogic(activeAgent, activeUnit, setProgress, { append, setMessages }) {
+export function useSprintLogic(activeAgent, activeUnit, setProgress) {
     const [scanImage, setScanImage] = useState(null);
     const [scanResult, setScanResult] = useState(null);
     const [scanning, setScanning] = useState(false);
-
-    const send = useCallback(async (text, profile) => {
-        if (!text.trim()) return;
-
-        // Pastikan append dipanggil dengan format yang diharapkan SDK versi 4+
-        if (typeof append === 'function') {
-            try {
-                await append({
-                    role: 'user',
-                    content: text
-                });
-            } catch (err) {
-                console.error("Error saat memanggil append:", err);
-            }
-        } else {
-            console.error("Append bukan fungsi:", append);
-        }
-
-        if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
-    }, [activeUnit, setProgress, append]);
 
     const runScan = useCallback(async (scanImageFile, sampleFn, allUnits, studentContext, baseRules) => {
         if (!scanImageFile || !sampleFn) return;
@@ -61,7 +41,6 @@ export function useSprintLogic(activeAgent, activeUnit, setProgress, { append, s
         scanResult,
         setScanResult,
         scanning,
-        send,
         runScan
     };
 }
