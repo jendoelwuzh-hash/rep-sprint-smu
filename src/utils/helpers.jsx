@@ -1,4 +1,4 @@
-// src/utils/helpers.js
+// src/utils/helpers.jsx
 
 export function todayStr() { return new Date().toISOString().slice(0, 10); }
 
@@ -46,9 +46,13 @@ export function serializeMessages(messages) {
 }
 
 export function deserializeMessages(saved) {
-    return (saved || []).map((m) => ({
+    // Pastikan 'saved' adalah array sebelum melakukan .map
+    if (!Array.isArray(saved)) return [];
+    
+    return saved.map((m) => ({
         role: m.role,
-        text: m.hadImage ? m.text + "\n\n(📷 foto soal dari sesi sebelumnya, tidak tersimpan setelah ditutup)" : m.text,
+        // Pastikan m.text ada sebelum dioperasikan
+        text: m.hadImage ? (m.text || "") + "\n\n(📷 foto soal dari sesi sebelumnya, tidak tersimpan setelah ditutup)" : (m.text || ""),
     }));
 }
 
