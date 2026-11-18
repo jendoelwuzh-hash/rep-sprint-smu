@@ -104,16 +104,18 @@ function App() {
     }, []);
 
     const discussScan = () => {
-        // PERBAIKAN: Tambahkan pengecekan keamanan (guard clause)
-        if (!scanResult || !Array.isArray(ALL_UNITS)) {
-            console.error("DEBUG: discussScan gagal - scanResult atau ALL_UNITS tidak valid", { scanResult, ALL_UNITS });
+        // PERBAIKAN: Proteksi total terhadap data yang hilang
+        if (!scanResult) {
+            console.error("DEBUG: scanResult kosong");
             return;
         }
 
+        // Gunakan [] sebagai fallback jika ALL_UNITS undefined
+        const unitsList = Array.isArray(ALL_UNITS) ? ALL_UNITS : [];
         const scanResultLower = scanResult.toLowerCase();
 
         // Cari unit dengan aman
-        const guess = ALL_UNITS.find((u) =>
+        const guess = unitsList.find((u) =>
             u && u.title && scanResultLower.includes(u.title.toLowerCase())
         ) || null;
 
