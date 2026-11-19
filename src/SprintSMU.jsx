@@ -41,9 +41,9 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Versi SDK v7 menerima string atau objek message lengkap.
-        // Kita kirim string langsung untuk kompatibilitas terbaik.
-        await sendMessage(text);
+        // Versi SDK v7 yang lebih ketat:
+        // Mengirimkan pesan sebagai objek dengan properti 'content' yang eksplisit.
+        await sendMessage({ role: 'user', content: text });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };
