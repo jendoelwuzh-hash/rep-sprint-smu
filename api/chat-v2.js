@@ -51,7 +51,9 @@ export default async function handler(req, res) {
             if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
             const body = { contents, generationConfig: { maxOutputTokens: 4096 } };
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+            const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${geminiKey}`;
+            console.log(`LOG: Attempting fetch to URL: ${url}`);
+            const r = await fetch(url, {
                 method: "POST",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(body),
