@@ -41,9 +41,9 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Versi SDK v7 yang lebih ketat:
-        // Mengirimkan pesan sebagai objek dengan properti 'content' yang eksplisit.
-        await sendMessage({ role: 'user', content: text });
+        // Versi SDK v7: Kirimkan string pesan langsung.
+        // SDK akan membungkusnya secara otomatis menjadi { role: 'user', content: text }
+        await sendMessage(text);
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };
