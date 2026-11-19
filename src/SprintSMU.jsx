@@ -41,10 +41,9 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Berdasarkan pemeriksaan kode internal:
-        // SDK mencoba melakukan 'text' in h.
-        // Maka kita WAJIB mengirim objek dengan properti 'text'.
-        await sendMessage({ text: text });
+        // Versi SDK v7 menerima string atau objek message lengkap.
+        // Kita kirim string langsung untuk kompatibilitas terbaik.
+        await sendMessage(text);
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };
