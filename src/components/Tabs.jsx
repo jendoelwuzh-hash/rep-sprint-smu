@@ -159,12 +159,16 @@ export function TutorTab({ unit, agent, messages, pending, error, input = "", ha
                     <span>{agent.emoji}</span>
                     <span>{unit ? ("Tanya apa saja soal " + unit.title + ", atau ketik \"kasih soal\" biar " + agent.name + " mulai duluan.") : "Ceritakan topik atau soal yang mau kamu bahas dulu."}</span>
                 </div>}
-                {messages.map((m, i) => (
-                    <div key={i} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%", background: m.role === "user" ? "#1D4ED8" : card, border: m.role === "user" ? "none" : "1px solid " + border, borderRadius: 14, padding: "10px 13px", fontSize: 13.5, lineHeight: 1.5, position: "relative" }}>
-                        <MathText text={m.content} />
-                        {m.role === "assistant" && <button onClick={() => speakText(m.content)} style={{ position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>🔊</button>}
-                    </div>
-                ))}
+                {messages.map((m, i) => {
+                    // Ambil isi pesan dengan aman (menangani format string atau objek)
+                    const content = typeof m.content === 'string' ? m.content : (m.parts?.[0]?.text || "");
+                    return (
+                        <div key={i} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%", background: m.role === "user" ? "#1D4ED8" : card, border: m.role === "user" ? "none" : "1px solid " + border, borderRadius: 14, padding: "10px 13px", fontSize: 13.5, lineHeight: 1.5, position: "relative" }}>
+                            <MathText text={content} />
+                            {m.role === "assistant" && <button onClick={() => speakText(content)} style={{ position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>🔊</button>}
+                        </div>
+                    );
+                })}
                 {pending && <div style={{ alignSelf: "flex-start", background: card, border: "1px solid " + border, borderRadius: 14, padding: "10px 13px" }}><span className="spinner"></span></div>}
                 {error && <div style={{ color: "#FCA5A5", fontSize: 12 }}>{error}</div>}
             </div>
