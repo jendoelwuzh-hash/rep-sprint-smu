@@ -2,8 +2,15 @@
 // Penyedia AI: Gemini API (ada tier gratis dari Google AI Studio)
 
 const VERSION = "v4-gemini";
-// Model Gemini yang diperintahkan:
-const GEMINI_MODELS = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"].filter(Boolean);
+// Model Gemini yang tersedia di akun Anda:
+const GEMINI_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-flash-latest",
+    "gemini-flash-lite-latest",
+    "gemini-pro-latest",
+    "gemini-2.5-flash-lite"
+];
 const MAX_CHARS = 30000;
 
 export default async function handler(req, res) {
@@ -29,11 +36,11 @@ export default async function handler(req, res) {
   if (total > MAX_CHARS) return res.status(413).json({ error: "too_large" });
 
   try {
-    // Mencoba model dari daftar yang diberikan
     let data;
     let success = false;
     let lastError = "";
 
+    // Mencoba model dari daftar yang tersedia satu per satu
     for (const model of GEMINI_MODELS) {
         try {
             console.log(`LOG: Trying Gemini API with model: ${model}`);
