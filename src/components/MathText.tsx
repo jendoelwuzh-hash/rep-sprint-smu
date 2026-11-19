@@ -12,6 +12,13 @@ export function MathText({ text }: MathTextProps) {
   let i = 0;
 
   while (i < text.length) {
+    // Handle newline (baris baru)
+    if (text[i] === '\n') {
+      nodes.push(<br key={key++} />);
+      i++;
+      continue;
+    }
+
     // Bold: ***text***
     if (text.startsWith('***', i)) {
       const end = text.indexOf('***', i + 3);
