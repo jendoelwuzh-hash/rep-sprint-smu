@@ -1,12 +1,12 @@
 // Vercel Serverless Function -> /api/chat
-// Memilih penyedia AI otomatis dari environment variable yang diisi di Vercel:
-//   - GITHUB_TOKEN      -> GitHub Models (gratis, ada batas pemakaian)
-//   - ANTHROPIC_API_KEY -> Claude API (berbayar, tanpa batas harian ketat)
-// Kalau keduanya ada, Claude API yang dipakai.
+// Penyedia AI: Gemini API (ada tier gratis dari Google AI Studio)
 
-const CLAUDE_MODEL = "claude-sonnet-5-5";
-const GITHUB_MODEL = process.env.GITHUB_MODEL || "openai/gpt-4o-mini";
+const VERSION = "v4-gemini";
+// Model Gemini resmi yang didukung:
+const GEMINI_MODELS = [process.env.GEMINI_MODEL, "gemini-2.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.5-flash"].filter(Boolean);
 const MAX_CHARS = 30000;
+const PER_TRY_MS = Number(process.env.PER_TRY_MS || 20000); // batas tunggu per model
+const TOTAL_MS = Number(process.env.TOTAL_MS || 50000);     // batas tunggu total
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
@@ -15,7 +15,10 @@ export default async function handler(req, res) {
   const ghToken = String(process.env.GITHUB_TOKEN || "").trim();
   const useClaude = !!claudeKey;
   const useGitHub = !useClaude && !!ghToken;
-  if (!useClaude && !useGitHub) return res.status(500).json({ error: "no_key" });
+  if (!useClaude && !useGitHub) {
+    console.error("Environment check failed: No API keys found.");
+    return res.status(500).json({ error: "no_key" });
+  }
 
   const { system, messages, imageBase64, imageType } = req.body || {};
   if (!Array.isArray(messages) || messages.length === 0 || messages.length > 20) {
