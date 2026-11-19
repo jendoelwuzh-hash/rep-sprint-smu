@@ -1,13 +1,11 @@
 // Vercel Serverless Function -> /api/chat
 // Penyedia AI: Gemini API
 
-// Model yang dipastikan ada di API Key Anda
 const GEMINI_MODELS = [
     "gemini-2.5-flash",
     "gemini-2.5-pro",
     "gemini-flash-latest",
     "gemini-flash-lite-latest",
-"gemini-3.8-flash",
     "gemini-pro-latest",
     "gemini-2.5-flash-lite"
 ];
@@ -18,53 +16,37 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
 
   const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
-
-  if (!geminiKey) {
-    console.error("CRITICAL: GEMINI_API_KEY is not defined");
-    return res.status(500).json({ error: "Configuration Error" });
-  }
+  if (!geminiKey) return res.status(500).json({ error: "Key missing" });
 
   const { system, messages } = req.body || {};
-  if (!Array.isArray(messages)) return res.status(400).json({ error: "Invalid body" });
 
   try {
-    let data, success = false, lastError = "";
-
     for (const model of GEMINI_MODELS) {
-        try {
-            console.log(`LOG: Trying Gemini API with model: ${model}`);
-            const contents = messages.map(m => ({
-                role: m.role === "assistant" ? "model" : "user",
-                parts: [{ text: String(m.content || " ") }]
-            }));
-            if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
+        console.log(`LOG: Mencoba model: ${model}`);
+        const contents = messages.map(m => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: [{ text: String(m.content || " ") }]
+        }));
+        if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ contents, generationConfig: { maxOutputTokens: 4096 } }),
-            });
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ contents, generationConfig: { maxOutputTokens: 4096 } }),
+        });
 
-            if (r.ok) {
-                data = await r.json();
-                success = true;
-                break;
-            } else {
-                lastError = await r.text();
-            }
-        } catch (e) {
-            console.error(`LOG: Failed model ${model}:`, e);
+        const textResponse = await r.text();
+        if (r.ok) {
+            const data = JSON.parse(textResponse);
+            console.log("LOG: Berhasil mendapatkan respon dari model:", model);
+            return res.status(200).json({ text: data.candidates?.[0]?.content?.parts?.[0]?.text });
+        } else {
+            console.error(`LOG: Model ${model} gagal dengan respon:`, textResponse);
         }
     }
-
-    if (!success) {
-        console.error("LOG: All models failed. Last error:", lastError);
-        return res.status(502).json({ error: "upstream", detail: lastError });
-    }
-
-    res.status(200).json({ text: data.candidates?.[0]?.content?.parts?.[0]?.text });
+    return res.status(502).json({ error: "Semua model gagal" });
   } catch (e) {
-    console.error("LOG: Chat error", e);
-    return res.status(500).json({ error: "Internal server error", detail: e.message });
+    console.error("LOG: Error fatal:", e);
+    return res.status(500).json({ error: e.message });
   }
 }
