@@ -41,9 +41,34 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Versi SDK v7: Kirimkan string pesan langsung.
-        // SDK akan membungkusnya secara otomatis menjadi { role: 'user', content: text }
-        await sendMessage(text);
+        // Tambahkan pesan user ke state secara manual
+        const newUserMessage = { role: 'user', content: text };
+        setMessages(prev => [...prev, newUserMessage]);
+
+        try {
+            // Kirim ke API secara manual menggunakan fetch, menghindari batasan SDK v7 yang membingungkan
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [...messages, newUserMessage],
+                    activeAgentId: activeAgent?.id,
+                    activeUnitId: activeUnit?.id
+                })
+            });
+            const data = await response.json();
+
+            // Tambahkan respon AI ke state secara manual
+            if (data.text) {
+                setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
+            } else if (data.error) {
+                console.error("API error:", data.error);
+                setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, sepertinya ada kendala teknis. Coba lagi nanti ya." }]);
+            }
+        } catch (err) {
+            console.error("Gagal mengambil respon AI:", err);
+            setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, koneksi ke tutor sedang terganggu." }]);
+        }
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };
