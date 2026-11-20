@@ -54,33 +54,29 @@ export function parseTextAndTables(text: string): ParsedBlock[] {
 
 export function parseBlocks(text: string): ParsedBlock[] {
   const blocks: ParsedBlock[] = [];
-  // Perbaikan regex: mendukung ```diagram``` ATAU ```mermaid```
-  const fenceRegex = /```(?:diagram|mermaid)\s*([\s\S]*?)```/g;
+  // Regex untuk menangkap ```mermaid atau ```diagram, termasuk isinya
+  const fenceRegex = /```(?:diagram|mermaid)\n([\s\S]*?)\n```/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = fenceRegex.exec(text)) !== null) {
+    // 1. Simpan teks sebelum blok diagram sebagai teks biasa
     const before = text.slice(lastIndex, match.index);
-    if (before) blocks.push(...parseTextAndTables(before));
+    if (before.trim()) blocks.push(...parseTextAndTables(before));
 
-    // Untuk diagram: kita akan bungkus spec-nya agar kompatibel dengan DiagramBlock
-    // Mermaid biasanya adalah string mentah, bukan JSON.
+    // 2. Simpan blok diagram itu sendiri
     const content = match[1].trim();
-    try {
-        blocks.push({
-            type: 'diagram',
-            spec: content.startsWith('{') ? JSON.parse(content) : { type: 'mermaid', code: content }
-        });
-    } catch (e) {
-        // Jika gagal parse JSON, anggap sebagai teks biasa
-        blocks.push({ type: 'text', content: match[0] });
-    }
+    blocks.push({
+        type: 'diagram',
+        spec: content.startsWith('{') ? JSON.parse(content) : { type: 'mermaid', code: content }
+    });
 
     lastIndex = fenceRegex.lastIndex;
   }
 
+  // 3. Simpan sisa teks setelah blok diagram
   const rest = text.slice(lastIndex);
-  if (rest) blocks.push(...parseTextAndTables(rest));
+  if (rest.trim()) blocks.push(...parseTextAndTables(rest));
 
   return blocks;
 }
