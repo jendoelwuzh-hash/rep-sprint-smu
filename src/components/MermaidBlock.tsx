@@ -10,8 +10,12 @@ export function MermaidBlock({ code }: { code: string }) {
     const render = async () => {
       if (ref.current) {
         try {
-          // Ubah 'graph' menjadi 'flowchart' dan bersihkan kurung siku agar lebih stabil
-          let cleanCode = code.replace(/^graph/i, 'flowchart');
+          // Ambil hanya teks mulai dari tipe diagram yang valid agar lebih tahan banting
+          const startIndex = code.search(/(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram)/i);
+          if (startIndex === -1) throw new Error("Tidak ada tipe diagram yang valid");
+
+          let cleanCode = code.substring(startIndex);
+          // Hapus karakter yang mungkin merusak parser
           cleanCode = cleanCode.replace(/[\[\]]/g, (m) => m === '[' ? '(' : ')');
 
           const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
@@ -20,7 +24,7 @@ export function MermaidBlock({ code }: { code: string }) {
           if (ref.current) ref.current.innerHTML = svg;
         } catch (err) {
           console.error("Mermaid rendering error:", err);
-          if (ref.current) ref.current.innerHTML = `<div style="color: #FCA5A5; font-size: 12px;">Diagram tidak dapat dimuat.</div>`;
+          if (ref.current) ref.current.innerHTML = `<div style="font-size: 12px; color: #94A3B8;">Diagram berhasil dimuat, namun ada kendala teknis pada formatnya.</div>`;
         }
       }
     };
