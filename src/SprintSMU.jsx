@@ -51,6 +51,7 @@ function App() {
                 })
             });
             const data = await response.json();
+            console.log("LOG: Data dari API:", data);
 
             if (data.text) {
                 setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
