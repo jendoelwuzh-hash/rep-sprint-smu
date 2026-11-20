@@ -1,6 +1,5 @@
 import { InteractiveVisualizer } from './components/InteractiveMath';
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useChat } from '@ai-sdk/react';
 import "./sprint-smu.css";
 import { useAuth } from './context/AuthContext';
 import { supabase } from './lib/supabaseClient';
@@ -25,28 +24,23 @@ function App() {
     const [activeUnit, setActiveUnit] = useState(null);
     const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
 
-    const chatHook = useChat({
-        api: '/api/chat',
-        body: {
-            activeAgentId: activeAgent?.id,
-            activeUnitId: activeUnit?.id
-        }
-    }) || { messages: [], isLoading: false, sendMessage: async () => {}, setMessages: () => {} };
+    // Manual chat state replacement for SDK v7 instability
+    const [messages, setMessages] = useState([]);
+    const [pending, setPending] = useState(false);
 
-        const { messages = [], isLoading: pending, sendMessage, setMessages } = chatHook;
     const { scanImage, setScanImage, scanResult, setScanResult, scanning, runScan } = useSprintLogic(activeAgent, activeUnit, setProgress);
 
     const [manualInput, setManualInput] = useState("");
     const handleManualInputChange = (e) => setManualInput(e.target.value);
+
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Tambahkan pesan user ke state secara manual
         const newUserMessage = { role: 'user', content: text };
         setMessages(prev => [...prev, newUserMessage]);
+        setPending(true);
 
         try {
-            // Kirim ke API secara manual menggunakan fetch, menghindari batasan SDK v7 yang membingungkan
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -58,16 +52,17 @@ function App() {
             });
             const data = await response.json();
 
-            // Tambahkan respon AI ke state secara manual
             if (data.text) {
                 setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
             } else if (data.error) {
                 console.error("API error:", data.error);
-                setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, sepertinya ada kendala teknis. Coba lagi nanti ya." }]);
+                setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, sepertinya ada kendala teknis." }]);
             }
         } catch (err) {
             console.error("Gagal mengambil respon AI:", err);
             setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, koneksi ke tutor sedang terganggu." }]);
+        } finally {
+            setPending(false);
         }
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
@@ -128,17 +123,14 @@ function App() {
     }, []);
 
     const discussScan = () => {
-        // PERBAIKAN: Proteksi total terhadap data yang hilang
         if (!scanResult) {
             console.error("DEBUG: scanResult kosong");
             return;
         }
 
-        // Gunakan [] sebagai fallback jika ALL_UNITS undefined
         const unitsList = Array.isArray(ALL_UNITS) ? ALL_UNITS : [];
         const scanResultLower = scanResult.toLowerCase();
 
-        // Cari unit dengan aman
         const guess = unitsList.find((u) =>
             u && u.title && scanResultLower.includes(u.title.toLowerCase())
         ) || null;
