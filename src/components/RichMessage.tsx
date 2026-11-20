@@ -65,15 +65,22 @@ interface RichMessageProps {
 }
 
 export function RichMessage({ text, accent }: RichMessageProps) {
-  const blocks = parseBlocks(text || '');
+  // Teknik: Pecah teks berdasarkan delimiter ```mermaid atau ```diagram
+  const parts = (text || '').split(/```(?:mermaid|diagram)/);
 
   return (
     <>
-      {blocks.map((b: ParsedBlock, idx: number) => {
-        if (b.type === 'table') return <MarkdownTable key={idx} header={b.header!} rows={b.rows!} accent={accent} />;
-        if (b.type === 'diagram') return <DiagramBlock key={idx} spec={b.spec!} accent={accent} />;
-        if (!b.content?.trim()) return null;
-        return <div key={idx} style={{ whiteSpace: 'pre-wrap' }}><MathText text={b.content} /></div>;
+      {parts.map((part, idx) => {
+        // Jika index genap (0, 2, 4...), itu adalah teks
+        if (idx % 2 === 0) {
+            if (!part.trim()) return null;
+            return <div key={idx} style={{ whiteSpace: 'pre-wrap' }}><MathText text={part} /></div>;
+        }
+        // Jika index ganjil (1, 3, 5...), itu adalah diagram (kita ambil kode sampai penutup ```)
+        else {
+            const code = part.split('```')[0].trim();
+            return <DiagramBlock key={idx} spec={{ type: 'mermaid', code }} accent={accent} />;
+        }
       })}
     </>
   );
