@@ -7,8 +7,10 @@ const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${API_K
 
 async function checkModels() {
   try {
+    console.log("DEBUG URL:", url.replace(API_KEY, "HIDDEN"));
     const response = await fetch(url);
     const data = await response.json();
+    console.log("DEBUG RESPONSE STATUS:", response.status);
     console.log("DEBUG RESPONSE:", JSON.stringify(data, null, 2)); const models = data.models ? data.models.map(m => m.name) : [];
 
     if (!models.includes(CURRENT_MODEL)) {

@@ -41,9 +41,12 @@ function App() {
     const handleSendMessage = async (text, profile) => {
         if (!text || !text.trim()) return;
 
-        // Versi SDK v7: Kirimkan string pesan langsung.
-        // SDK akan membungkusnya secara otomatis menjadi { role: 'user', content: text }
-        await sendMessage(text);
+        // Menggunakan format payload yang secara eksplisit disarankan untuk SDK v7
+        // Jika sendMessage tetap error, berarti ada wrapper di sekitar chatHook kita
+        await sendMessage({
+            role: 'user',
+            content: text
+        });
 
         if (activeUnit) setProgress((p) => bumpUnit(p, activeUnit.id));
     };

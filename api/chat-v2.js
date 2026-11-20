@@ -1,28 +1,27 @@
 // Vercel Serverless Function -> /api/chat
 // Penyedia AI: Gemini API (ada tier gratis dari Google AI Studio)
 
-const VERSION = "v4-gemini";
-// Model Gemini yang tersedia di akun Anda:
+// Model yang dipastikan ada di API Key Anda
 const GEMINI_MODELS = [
     "gemini-2.5-flash",
     "gemini-2.5-pro",
     "gemini-flash-latest",
     "gemini-flash-lite-latest",
+"gemini-3.8-flash",
     "gemini-pro-latest",
     "gemini-2.5-flash-lite"
 ];
-const MAX_CHARS = 30000;
 
 export default async function handler(req, res) {
-  console.log("LOG: API handler dipanggil!");
+  // Tambahkan log untuk debug key
+  console.log("LOG: API handler dipanggil, key length:", process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.length : "null");
+
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
 
   const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
-  const keyExists = !!geminiKey;
-  console.log("LOG: Apakah API KEY ada?", keyExists);
 
-  if (!keyExists) {
+  if (!geminiKey) {
     console.error("CRITICAL: GEMINI_API_KEY is not defined in environment");
     return res.status(500).json({ error: "Configuration Error: API Key missing" });
   }
@@ -32,50 +31,31 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "bad_messages" });
   }
 
-  const total = JSON.stringify(messages).length + String(system || "").length;
-  if (total > MAX_CHARS) return res.status(413).json({ error: "too_large" });
-
   try {
-    let data;
-    let success = false;
-    let lastError = "";
+    const model = GEMINI_MODELS[0];
 
-    // Mencoba model dari daftar yang tersedia satu per satu
-    for (const model of GEMINI_MODELS) {
-        try {
-            console.log(`LOG: Trying Gemini API with model: ${model}`);
-            const contents = messages.map(m => ({
-                role: m.role === "assistant" ? "model" : "user",
-                parts: [{ text: String(m.content || " ") }]
-            }));
-            if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
+    const contents = messages.map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: String(m.content || " ") }]
+    }));
+    if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
 
-            const body = { contents, generationConfig: { maxOutputTokens: 4096 } };
-            const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${geminiKey}`;
-            console.log(`LOG: Attempting fetch to URL: ${url}`);
-            const r = await fetch(url, {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify(body),
-            });
+    const body = { contents, generationConfig: { maxOutputTokens: 4096 } };
 
-            if (r.ok) {
-                data = await r.json();
-                success = true;
-                break;
-            } else {
-                lastError = await r.text();
-                console.error(`LOG: Model ${model} failed:`, lastError);
-            }
-        } catch (e) {
-            console.error(`LOG: Error with model ${model}:`, e);
-        }
+    console.log(`LOG: Calling Gemini API with model: ${model}`);
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+    });
+
+    if (!r.ok) {
+        const errorText = await r.text();
+        console.error("LOG: ERROR FATAL di API:", errorText);
+        return res.status(502).json({ error: "upstream", status: r.status, detail: errorText });
     }
 
-    if (!success) {
-        return res.status(502).json({ error: "upstream", detail: lastError });
-    }
-
+    const data = await r.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     res.status(200).json({ text });
 

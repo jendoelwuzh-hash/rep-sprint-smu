@@ -16,16 +16,22 @@ let availableModels = [];
 
 async function refreshModels() {
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) return;
+    if (!geminiKey) {
+        console.error("refreshModels: GEMINI_API_KEY is missing.");
+        return;
+    }
     try {
+        console.log("refreshModels: Attempting to fetch models list...");
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`);
         const data = await r.json();
         if (data.models) {
             availableModels = data.models.map(m => m.name.replace('models/', ''));
-            console.log("Model yang tersedia diperbarui:", availableModels);
+            console.log("refreshModels: Models list updated:", availableModels);
+        } else {
+            console.error("refreshModels: No models found in API response:", data);
         }
     } catch (e) {
-        console.error("Gagal mendeteksi model:", e);
+        console.error("refreshModels: Failed to detect models:", e);
     }
 }
 
@@ -42,7 +48,10 @@ refreshModels();
 
 app.post('/api/chat', async (req, res) => {
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) return res.status(500).json({ error: "no_key" });
+    if (!geminiKey) {
+        console.error("Gemini API Key missing.");
+        return res.status(500).json({ error: "no_key" });
+    }
 
     const model = getBestModel('flash');
     const { system, messages } = req.body || {};
@@ -67,7 +76,10 @@ app.post('/api/chat', async (req, res) => {
 
 app.post('/api/vision', async (req, res) => {
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) return res.status(500).json({ error: "no_key" });
+    if (!geminiKey) {
+        console.error("Gemini API Key missing.");
+        return res.status(500).json({ error: "no_key" });
+    }
 
     const model = getBestModel('flash');
     const { prompt, imageBase64, imageType } = req.body || {};
