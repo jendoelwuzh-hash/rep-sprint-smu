@@ -2,6 +2,7 @@
 import React from 'react';
 import { Pill, Ring, NavBtn } from './UI.jsx';
 import { MathText } from './MathText.jsx';
+import { RichMessage } from './RichMessage.tsx';
 import { SUBJECTS, AGENTS, ALL_UNITS } from '../data/subjects';
 
 export function HomeTab({ progress, activeSubject, setActiveSubject, activeGrade, setActiveGrade, onOpenUnit, card, border }) {
@@ -164,7 +165,7 @@ export function TutorTab({ unit, agent, messages, pending, error, input = "", ha
                     const content = typeof m.content === 'string' ? m.content : (m.parts?.[0]?.text || "");
                     return (
                         <div key={i} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%", background: m.role === "user" ? "#1D4ED8" : card, border: m.role === "user" ? "none" : "1px solid " + border, borderRadius: 14, padding: "10px 13px", fontSize: 13.5, lineHeight: 1.5, position: "relative" }}>
-                            <MathText text={content} />
+                            <RichMessage text={content} accent={agent.color} />
                             {m.role === "assistant" && <button onClick={() => speakText(content)} style={{ position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>🔊</button>}
                         </div>
                     );
