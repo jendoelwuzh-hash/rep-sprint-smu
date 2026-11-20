@@ -54,18 +54,28 @@ export function parseTextAndTables(text: string): ParsedBlock[] {
 
 export function parseBlocks(text: string): ParsedBlock[] {
   const blocks: ParsedBlock[] = [];
-  const fenceRegex = /```diagram\s*([\s\S]*?)```/g;
+  // Perbaikan regex: mendukung ```diagram``` ATAU ```mermaid```
+  const fenceRegex = /```(?:diagram|mermaid)\s*([\s\S]*?)```/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = fenceRegex.exec(text)) !== null) {
     const before = text.slice(lastIndex, match.index);
     if (before) blocks.push(...parseTextAndTables(before));
+
+    // Untuk diagram: kita akan bungkus spec-nya agar kompatibel dengan DiagramBlock
+    // Mermaid biasanya adalah string mentah, bukan JSON.
+    const content = match[1].trim();
     try {
-      blocks.push({ type: 'diagram', spec: JSON.parse(match[1].trim()) as DiagramSpec });
+        blocks.push({
+            type: 'diagram',
+            spec: content.startsWith('{') ? JSON.parse(content) : { type: 'mermaid', code: content }
+        });
     } catch (e) {
-      // ignore invalid JSON
+        // Jika gagal parse JSON, anggap sebagai teks biasa
+        blocks.push({ type: 'text', content: match[0] });
     }
+
     lastIndex = fenceRegex.lastIndex;
   }
 
