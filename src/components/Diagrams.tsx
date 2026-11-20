@@ -177,7 +177,6 @@ const SHAPE_NAMES = ['circle', 'triangle', 'rectangle', 'square', 'polygon'];
 export function DiagramBlock({ spec, accent }: DiagramBlockProps) {
   const type = (spec.type || '').toString().toLowerCase().trim();
 
-  // Logika untuk merender Mermaid menggunakan komponen yang kita buat
   if (type === 'mermaid') return <MermaidBlock code={spec.code || spec.spec?.code || ''} />;
 
   if (type === 'coordinate') return <CoordinatePlane spec={spec} accent={accent} />;
