@@ -54,17 +54,15 @@ export function parseTextAndTables(text: string): ParsedBlock[] {
 
 export function parseBlocks(text: string): ParsedBlock[] {
   const blocks: ParsedBlock[] = [];
-  // Regex untuk menangkap ```mermaid atau ```diagram, termasuk isinya
-  const fenceRegex = /```(?:diagram|mermaid)\n([\s\S]*?)\n```/g;
+  // Regex lebih longgar: menangani spasi atau tanpa spasi setelah ```, dan baris baru fleksibel
+  const fenceRegex = /```(?:diagram|mermaid)([ \t]*\n[\s\S]*?)```/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = fenceRegex.exec(text)) !== null) {
-    // 1. Simpan teks sebelum blok diagram sebagai teks biasa
     const before = text.slice(lastIndex, match.index);
     if (before.trim()) blocks.push(...parseTextAndTables(before));
 
-    // 2. Simpan blok diagram itu sendiri
     const content = match[1].trim();
     blocks.push({
         type: 'diagram',
@@ -74,7 +72,6 @@ export function parseBlocks(text: string): ParsedBlock[] {
     lastIndex = fenceRegex.lastIndex;
   }
 
-  // 3. Simpan sisa teks setelah blok diagram
   const rest = text.slice(lastIndex);
   if (rest.trim()) blocks.push(...parseTextAndTables(rest));
 
