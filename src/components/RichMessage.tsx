@@ -66,7 +66,7 @@ interface RichMessageProps {
 
 export function RichMessage({ text, accent }: RichMessageProps) {
   // Teknik: Pecah teks berdasarkan delimiter ```mermaid atau ```diagram, lebih toleran terhadap spasi/baris baru
-  const parts = (text || '').split(/```(?:mermaid|diagram)[\s]*/i);
+  const parts = (text || '').split(/\n*```(?:mermaid|diagram)[\s]*/i);
 
   return (
     <>
