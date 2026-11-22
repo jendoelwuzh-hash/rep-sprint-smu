@@ -53,8 +53,14 @@ function App() {
             const data = await response.json();
             console.log("LOG: Data dari API:", data);
 
+            // Sanitizer untuk respon AI agar tidak crash saat JSON parsing
+            const sanitizeRes = (raw) => {
+                if (typeof raw !== 'string') return String(raw);
+                return raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+            };
+
             if (data.text) {
-                setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
+                setMessages(prev => [...prev, { role: 'assistant', content: sanitizeRes(data.text) }]);
             } else if (data.error) {
                 console.error("API error:", data.error);
                 setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, sepertinya ada kendala teknis." }]);

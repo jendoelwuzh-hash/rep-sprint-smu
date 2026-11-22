@@ -65,10 +65,14 @@ interface RichMessageProps {
 }
 
 export function RichMessage({ text, accent }: RichMessageProps) {
-  // Langsung tampilkan teks tanpa mencoba memproses blok Mermaid yang rentan error
+  // Pastikan Mermaid dirender sebagai teks murni agar tidak crash
+  const sanitizedText = text.replace(/```mermaid\n([\s\S]*?)\n```/g, (match, code) => {
+    return `[Diagram Mermaid]\n${code}`;
+  });
+
   return (
     <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5 }}>
-      <MathText text={text} />
+      <MathText text={sanitizedText} />
     </div>
   );
 }

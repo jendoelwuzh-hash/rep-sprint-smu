@@ -55,7 +55,12 @@ export default async function handler(req, res) {
         return res.status(502).json({ error: "upstream", detail: lastError });
     }
 
-    res.status(200).json({ text: data.candidates?.[0]?.content?.parts?.[0]?.text });
+    const sanitize = (text) => {
+        if (!text) return "";
+        return text.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+    };
+
+    res.status(200).json({ text: sanitize(data.candidates?.[0]?.content?.parts?.[0]?.text) });
   } catch (e) {
     console.error("LOG: Chat error", e);
     return res.status(500).json({ error: "Internal server error", detail: e.message });
