@@ -78,9 +78,8 @@ function App() {
     const handleManualSubmit = async () => {
         if (!manualInput || !manualInput.trim()) return;
 
-        // Jangan kirim sistem prompt sebagai bagian dari chat message
-        // Kirim hanya input pengguna ke handleSendMessage
-        // Sistem prompt akan dikelola di sisi API (handler chat)
+        // Kirim HANYA manualInput, tanpa instruksi sistem sama sekali.
+        // Instruksi sistem sudah ditangani di server (api/chat.js).
         await handleSendMessage(manualInput, profile);
         setManualInput("");
     };
