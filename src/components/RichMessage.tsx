@@ -65,10 +65,8 @@ interface RichMessageProps {
 }
 
 export function RichMessage({ text, accent }: RichMessageProps) {
-  // Pastikan Mermaid dirender sebagai teks murni agar tidak crash
-  const sanitizedText = text.replace(/```mermaid\n([\s\S]*?)\n```/g, (match, code) => {
-    return `[Diagram Mermaid]\n${code}`;
-  });
+  // Bersihkan teks: hapus blok mermaid dan kode di dalamnya agar tidak muncul di chat
+  const sanitizedText = text.replace(/```mermaid[\s\S]*?```/g, "[Visualisasi Diagram]");
 
   return (
     <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5 }}>
