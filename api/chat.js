@@ -4,13 +4,12 @@
 // Gunakan model yang terbukti berhasil dan memiliki kuota
 const GEMINI_MODELS = [
     "gemini-flash-lite-latest",
-    "gemini-2.5-flash-lite", 
+    "gemini-2.5-flash-lite",
     "gemini-3.8-flash",
-    "gemini-3.1-flash-lite" 
+    "gemini-3.1-flash-lite"
 ];
 
 export default async function handler(req, res) {
-  console.log("LOG: API handler dipanggil!");
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
 
@@ -23,19 +22,31 @@ export default async function handler(req, res) {
   try {
     let data, success = false, lastError = "";
 
+    // Bersihkan pesan agar prompt sistem tidak disisipkan sebagai user message yang membingungkan model
+    // Filter pesan yang merupakan replika dari prompt sistem agar tidak muncul di chat
+    const filteredMessages = messages.filter(m => m.role !== 'system' && !m.content.includes("INSTRUKSI WAJIB"));
+
     for (const model of GEMINI_MODELS) {
         try {
-            console.log(`LOG: Trying Gemini API with model: ${model}`);
-            const contents = messages.map(m => ({
+            const contents = filteredMessages.map(m => ({
                 role: m.role === "assistant" ? "model" : "user",
                 parts: [{ text: String(m.content || " ") }]
             }));
-            if (system) contents.unshift({ role: "user", parts: [{ text: String(system) }] });
+
+            // Masukkan system prompt sebagai parameter khusus jika API mendukung,
+            // atau tambahkan di awal jika perlu, namun jangan biarkan muncul di bubble chat
+            const requestBody = {
+                contents,
+                generationConfig: { maxOutputTokens: 4096 }
+            };
+            if (system) {
+                requestBody.systemInstruction = { parts: [{ text: String(system) }] };
+            }
 
             const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
                 method: "POST",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify({ contents, generationConfig: { maxOutputTokens: 4096 } }),
+                body: JSON.stringify(requestBody),
             });
 
             if (r.ok) {
@@ -51,7 +62,6 @@ export default async function handler(req, res) {
     }
 
     if (!success) {
-        console.error("LOG: All models failed. Last error:", lastError);
         return res.status(502).json({ error: "upstream", detail: lastError });
     }
 
@@ -62,7 +72,6 @@ export default async function handler(req, res) {
 
     res.status(200).json({ text: sanitize(data.candidates?.[0]?.content?.parts?.[0]?.text) });
   } catch (e) {
-    console.error("LOG: Chat error", e);
     return res.status(500).json({ error: "Internal server error", detail: e.message });
   }
 }
