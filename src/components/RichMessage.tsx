@@ -65,23 +65,10 @@ interface RichMessageProps {
 }
 
 export function RichMessage({ text, accent }: RichMessageProps) {
-  // Teknik: Pecah teks berdasarkan delimiter ```mermaid atau ```diagram, lebih toleran terhadap spasi/baris baru
-  const parts = (text || '').split(/\n*```(?:mermaid|diagram)[\s]*/i);
-
+  // Langsung tampilkan teks tanpa mencoba memproses blok Mermaid yang rentan error
   return (
-    <>
-      {parts.map((part, idx) => {
-        // Jika index genap (0, 2, 4...), itu adalah teks
-        if (idx % 2 === 0) {
-            if (!part.trim()) return null;
-            return <div key={idx} style={{ whiteSpace: 'pre-wrap' }}><MathText text={part} /></div>;
-        }
-        // Jika index ganjil (1, 3, 5...), itu adalah diagram (kita ambil kode sampai penutup ```)
-        else {
-            const code = part.split('```')[0].trim();
-            return <DiagramBlock key={idx} spec={{ type: 'mermaid', code }} accent={accent} />;
-        }
-      })}
-    </>
+    <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5 }}>
+      <MathText text={text} />
+    </div>
   );
 }
