@@ -78,18 +78,10 @@ function App() {
     const handleManualSubmit = async () => {
         if (!manualInput || !manualInput.trim()) return;
 
-        const instructionText = [
-            activeAgent.system,
-            "INSTRUKSI WAJIB: Untuk setiap ilustrasi visual, diagram, atau grafik, SELALU gunakan format diagram Mermaid (di dalam blok ```mermaid ... ```). JANGAN PERNAH menggunakan ASCII atau teks biasa untuk menggambarkan bentuk, vektor, atau grafik.",
-            STUDENT_CONTEXT,
-            profile ? `Profil Siswa: Kelas ${profile.class || 'tidak diketahui'}. Topik yang perlu diperkuat: ${Array.isArray(profile.weak_topics) ? profile.weak_topics.join(', ') : (profile.weak_topics || 'tidak ada spesifik')}.` : "",
-            activeUnit ? ("Siswa sedang membahas mata pelajaran " +
-                (activeUnit.subject === "kimia" ? "Kimia" : activeUnit.subject === "fisika" ? "Fisika" : "Matematika") +
-                ", topik: " + activeUnit.title + " (" + activeUnit.subtitle + ").") : "",
-            BASE_RULES,
-        ].filter(Boolean).join("\n\n");
-
-        await handleSendMessage(`${instructionText}\n\n${manualInput}`, profile);
+        // Jangan kirim sistem prompt sebagai bagian dari chat message
+        // Kirim hanya input pengguna ke handleSendMessage
+        // Sistem prompt akan dikelola di sisi API (handler chat)
+        await handleSendMessage(manualInput, profile);
         setManualInput("");
     };
 

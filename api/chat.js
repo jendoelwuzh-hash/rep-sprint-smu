@@ -9,6 +9,8 @@ const GEMINI_MODELS = [
     "gemini-3.1-flash-lite"
 ];
 
+import { AGENTS, ALL_UNITS, STUDENT_CONTEXT, BASE_RULES } from '../src/data/subjects.js';
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
@@ -16,8 +18,18 @@ export default async function handler(req, res) {
   const geminiKey = String(process.env.GEMINI_API_KEY || "").trim();
   if (!geminiKey) return res.status(500).json({ error: "Key missing" });
 
-  const { system, messages } = req.body || {};
+  const { activeAgentId, activeUnitId, messages } = req.body || {};
   if (!Array.isArray(messages)) return res.status(400).json({ error: "Invalid body" });
+
+  // Konstruksi system prompt dinamis
+  const agent = AGENTS.find(a => a.id === activeAgentId) || AGENTS[0];
+  const unit = ALL_UNITS.find(u => u.id === activeUnitId);
+  const system = [
+      agent.system,
+      "INSTRUKSI WAJIB: Gunakan format Mermaid untuk diagram.",
+      STUDENT_CONTEXT,
+      unit ? `Topik: ${unit.title}` : ""
+  ].filter(Boolean).join("\n\n");
 
   try {
     let data, success = false, lastError = "";
