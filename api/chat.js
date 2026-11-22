@@ -22,9 +22,14 @@ export default async function handler(req, res) {
   try {
     let data, success = false, lastError = "";
 
-    // Bersihkan pesan agar prompt sistem tidak disisipkan sebagai user message yang membingungkan model
-    // Filter pesan yang merupakan replika dari prompt sistem agar tidak muncul di chat
-    const filteredMessages = messages.filter(m => m.role !== 'system' && !m.content.includes("INSTRUKSI WAJIB"));
+    // Filter pesan: Buang pesan yang berisi instruksi sistem agar tidak muncul di chat bubble
+    // Cek apakah content mengandung kata kunci instruksi sistem
+    const isSystemInstruction = (text) => {
+        const triggers = ["INSTRUKSI WAJIB", "Konteks siswa:", "BASE_RULES", "Guru Sabar", "Teman Belajar", "Guru Kilat", "Kuis Master", "Agen Soal HOTS", "Master Trik"];
+        return triggers.some(trigger => text.includes(trigger));
+    };
+
+    const filteredMessages = messages.filter(m => m.role !== 'system' && !isSystemInstruction(m.content));
 
     for (const model of GEMINI_MODELS) {
         try {
@@ -33,8 +38,6 @@ export default async function handler(req, res) {
                 parts: [{ text: String(m.content || " ") }]
             }));
 
-            // Masukkan system prompt sebagai parameter khusus jika API mendukung,
-            // atau tambahkan di awal jika perlu, namun jangan biarkan muncul di bubble chat
             const requestBody = {
                 contents,
                 generationConfig: { maxOutputTokens: 4096 }
