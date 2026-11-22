@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   const unit = ALL_UNITS.find(u => u.id === activeUnitId);
   const system = [
       agent.system,
-      "INSTRUKSI WAJIB: Gunakan format Mermaid untuk diagram.",
+      "INSTRUKSI WAJIB: Jangan pernah gunakan Mermaid. Jika butuh diagram, berikan spesifikasi JSON untuk komponen SVG internal kami (tipe: 'coordinate', 'numberline', 'bar', atau 'shape').",
       STUDENT_CONTEXT,
       unit ? `Topik: ${unit.title}` : ""
   ].filter(Boolean).join("\n\n");
