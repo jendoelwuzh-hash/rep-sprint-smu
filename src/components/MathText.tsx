@@ -108,29 +108,23 @@ export function MathText({ text }: MathTextProps) {
       }
     }
 
-    // Superscript: ^{n} or ^n
+    // Subscript: H_2
+    if (text[i] === '_') {
+      const char = text[i + 1];
+      nodes.push(<sub key={key++} style={{ fontSize: '0.8em' }}>{char}</sub>);
+      i += 2;
+      continue;
+    }
+
+    // Superscript: ^(isi) atau ^n
     if (text[i] === '^') {
       const braced = readBraced(text, i + 1);
       if (braced) {
-        nodes.push(<sup key={key++} style={{ fontSize: '0.75em' }}>{braced.content}</sup>);
+        nodes.push(<sup key={key++} style={{ fontSize: '0.8em' }}>{braced.content}</sup>);
         i = braced.end;
         continue;
-      } else if (/[0-9a-zA-Z-]/.test(text[i + 1] || '')) {
-        nodes.push(<sup key={key++} style={{ fontSize: '0.75em' }}>{text[i + 1]}</sup>);
-        i += 2;
-        continue;
-      }
-    }
-
-    // Subscript: _{n} or _n
-    if (text[i] === '_') {
-      const braced = readBraced(text, i + 1);
-      if (braced) {
-        nodes.push(<sub key={key++} style={{ fontSize: '0.75em' }}>{braced.content}</sub>);
-        i = braced.end;
-        continue;
-      } else if (/[0-9a-zA-Z]/.test(text[i + 1] || '')) {
-        nodes.push(<sub key={key++} style={{ fontSize: '0.75em' }}>{text[i + 1]}</sub>);
+      } else if (text[i + 1]) {
+        nodes.push(<sup key={key++} style={{ fontSize: '0.8em' }}>{text[i + 1]}</sup>);
         i += 2;
         continue;
       }
