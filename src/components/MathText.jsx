@@ -1,18 +1,27 @@
 import React from 'react';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 export function MathText({ text }) {
-    // 1. Guard clause: Jika text tidak ada atau bukan string, return null atau teks kosong
-    if (!text || typeof text !== 'string') {
-        return null;
-    }
+    if (!text || typeof text !== 'string') return null;
 
-    // 2. Gunakan try-catch saat pemrosesan teks jika ada logic regex yang kompleks
-    try {
-        // Jika teks mengandung blok Mermaid, kita tampilkan secara sederhana
-        // Agar tidak crash saat rendering
-        return <div style={{ whiteSpace: 'pre-wrap' }}>{text}</div>;
-    } catch (e) {
-        console.error("MathText render error:", e);
-        return <div>{text}</div>;
-    }
+    // Fungsi untuk memisahkan teks biasa dengan formula LaTeX
+    // Mencari pola $...$ untuk inline dan $$...$$ untuk block
+    const renderWithLatex = (str) => {
+        const parts = str.split(/(\$\$[\s\S]*?\$\$|\$.*?\$)/g);
+        return parts.map((part, index) => {
+            if (part.startsWith('$$') && part.endsWith('$$')) {
+                return <BlockMath key={index} math={part.slice(2, -2)} />;
+            } else if (part.startsWith('$') && part.endsWith('$')) {
+                return <InlineMath key={index} math={part.slice(1, -1)} />;
+            }
+            return <span key={index}>{part}</span>;
+        });
+    };
+
+    return (
+        <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+            {renderWithLatex(text)}
+        </div>
+    );
 }

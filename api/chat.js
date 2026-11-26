@@ -27,6 +27,7 @@ export default async function handler(req, res) {
   const system = [
       agent.system,
       "INSTRUKSI WAJIB: Jangan pernah gunakan Mermaid. Jika butuh diagram, berikan spesifikasi JSON untuk komponen SVG internal kami (tipe: 'coordinate', 'numberline', 'bar', atau 'shape').",
+      "INSTRUKSI FORMAT: Gunakan LaTeX untuk penulisan matematika, fisika, dan kimia (contoh: $T_{1/2}$, \\frac{1}{2}, $N_0$).",
       STUDENT_CONTEXT,
       unit ? `Topik: ${unit.title}` : ""
   ].filter(Boolean).join("\n\n");
