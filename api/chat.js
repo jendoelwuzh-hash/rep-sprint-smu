@@ -28,6 +28,7 @@ export default async function handler(req, res) {
       agent.system,
       "INSTRUKSI WAJIB: Jangan pernah gunakan Mermaid. Jika butuh diagram, berikan spesifikasi JSON untuk komponen SVG internal kami (tipe: 'coordinate', 'numberline', 'bar', atau 'shape').",
       "INSTRUKSI FORMAT: Gunakan LaTeX untuk penulisan matematika, fisika, dan kimia (contoh: $T_{1/2}$, \\frac{1}{2}, $N_0$).",
+      "INSTRUKSI PARAGRAF: SELALU pisahkan setiap langkah atau poin bahasan dengan dua kali baris baru (spasi ganda / \\n\\n). Jangan menumpuk teks menjadi satu paragraf besar.",
       STUDENT_CONTEXT,
       unit ? `Topik: ${unit.title}` : ""
   ].filter(Boolean).join("\n\n");

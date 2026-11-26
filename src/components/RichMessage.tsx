@@ -72,7 +72,14 @@ export function RichMessage({ text, accent }: RichMessageProps) {
   sanitizedText = sanitizedText.replace(/```/g, "");
 
   return (
-    <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5 }}>
+    <div style={{
+      whiteSpace: 'pre-wrap',
+      fontSize: 14,
+      lineHeight: 1.6,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px' // Memberi jarak antar paragraf
+    }}>
       <MathText text={sanitizedText} />
     </div>
   );
