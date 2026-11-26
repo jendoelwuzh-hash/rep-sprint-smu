@@ -161,12 +161,13 @@ export function TutorTab({ unit, agent, messages, pending, error, input = "", ha
                     <span>{unit ? ("Tanya apa saja soal " + unit.title + ", atau ketik \"kasih soal\" biar " + agent.name + " mulai duluan.") : "Ceritakan topik atau soal yang mau kamu bahas dulu."}</span>
                 </div>}
                 {messages.map((m, i) => {
-                    // Ambil isi pesan dengan aman (menangani format string atau objek)
+                    // Ambil isi pesan dengan aman
                     const content = typeof m.content === 'string' ? m.content : (m.parts?.[0]?.text || "");
                     return (
                         <div key={i} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%", background: m.role === "user" ? "#1D4ED8" : card, border: m.role === "user" ? "none" : "1px solid " + border, borderRadius: 14, padding: "10px 13px", fontSize: 13.5, lineHeight: 1.5, position: "relative" }}>
+                            {/* Pass agent sebagai parameter kedua agar speakText bisa akses agent.id */}
                             <RichMessage text={content} accent={agent.color} />
-                            {m.role === "assistant" && <button onClick={() => speakText(content)} style={{ position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>🔊</button>}
+                            {m.role === "assistant" && <button onClick={() => speakText(content, agent)} style={{ position: "absolute", bottom: 4, right: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>🔊</button>}
                         </div>
                     );
                 })}

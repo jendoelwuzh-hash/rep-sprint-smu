@@ -145,11 +145,34 @@ function App() {
         setTab("tutor");
     };
 
-    const speakText = (text) => {
+    const speakText = (text, agent) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'id-ID';
+
+            // Mengatur suara dan nada berdasarkan karakter tutor
+            // Kita coba pilih suara wanita (biasanya di android/windows adalah Google Bahasa Indonesia)
+            // Pitch dan Rate diatur sedikit berbeda untuk tiap karakter agar tidak terasa robotik
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.lang === 'id-ID' && v.name.includes('Google')) || voices[0];
+
+            utterance.voice = preferredVoice;
+
+            if (agent.id === 'sabar') {
+                utterance.pitch = 0.9;
+                utterance.rate = 0.9; // Lebih pelan, lebih tenang
+            } else if (agent.id === 'santai') {
+                utterance.pitch = 1.0;
+                utterance.rate = 1.0;
+            } else if (agent.id === 'kilat') {
+                utterance.pitch = 1.2;
+                utterance.rate = 1.2; // Lebih cepat, to-the-point
+            } else {
+                utterance.pitch = 1.0;
+                utterance.rate = 1.0;
+            }
+
             window.speechSynthesis.speak(utterance);
         }
     };
