@@ -65,11 +65,7 @@ interface RichMessageProps {
 }
 
 export function RichMessage({ text, accent }: RichMessageProps) {
-  // Bersihkan teks: hapus blok mermaid dan json diagram.
-  // Ditambah pembersihan karakter ``` agar tidak muncul di chat.
-  let sanitizedText = text.replace(/```mermaid[\s\S]*?```/gi, "");
-  sanitizedText = sanitizedText.replace(/```json[\s\S]*?```/gi, "");
-  sanitizedText = sanitizedText.replace(/```/g, "");
+  const blocks = parseBlocks(text);
 
   return (
     <div style={{
@@ -78,9 +74,17 @@ export function RichMessage({ text, accent }: RichMessageProps) {
       lineHeight: 1.6,
       display: 'flex',
       flexDirection: 'column',
-      gap: '12px' // Memberi jarak antar paragraf
+      gap: '12px'
     }}>
-      <MathText text={sanitizedText} />
+      {blocks.map((block, i) => {
+        if (block.type === 'diagram') {
+          return <DiagramBlock key={i} spec={block.spec} accent={accent} />;
+        }
+        if (block.type === 'table') {
+          return <MarkdownTable key={i} header={block.header} rows={block.rows} accent={accent} />;
+        }
+        return <MathText key={i} text={block.content} />;
+      })}
     </div>
   );
 }

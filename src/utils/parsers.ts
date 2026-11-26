@@ -55,7 +55,8 @@ export function parseTextAndTables(text: string): ParsedBlock[] {
 export function parseBlocks(text: string): ParsedBlock[] {
   const blocks: ParsedBlock[] = [];
   // Regex lebih longgar: menangani spasi atau tanpa spasi setelah ```, dan baris baru fleksibel
-  const fenceRegex = /```(?:diagram|mermaid)([ \t]*\n[\s\S]*?)```/g;
+  // Menambahkan 'json' agar tertangkap oleh parser diagram
+  const fenceRegex = /```(?:diagram|mermaid|json)([ \t]*\n[\s\S]*?)```/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
